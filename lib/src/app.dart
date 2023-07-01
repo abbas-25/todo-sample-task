@@ -8,7 +8,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:todo_sample/src/config/app_theme.dart';
 import 'package:todo_sample/src/config/database_constants.dart';
-import 'package:todo_sample/src/config/dummy_data.dart';
 import 'package:todo_sample/src/routes/app_router.dart';
 import 'package:todo_sample/src/views/home/home_page.dart';
 
@@ -34,12 +33,13 @@ class _MyAppState extends State<MyApp> {
   addSampleTodoToTestingCollection() {
     try {
       final db = Databases(widget.client);
-      final sampleTodo = DummyData.getTasks().first;
       db.createDocument(
         databaseId: primaryDatabaseId,
         collectionId: testingCollectionId,
         documentId: ID.unique(),
-        data: sampleTodo.toMap(),
+        data: {
+          "title": "testing appwrite collection write"
+        },
       );
     } catch (exception) {
       log("Error Logged in Appwrite call addSampleTodoToTestingCollection  - $exception");
