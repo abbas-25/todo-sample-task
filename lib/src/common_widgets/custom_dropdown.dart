@@ -7,10 +7,13 @@ import 'package:todo_sample/src/config/typography.dart';
 class CustomDropdown extends StatefulWidget {
   final List<String> options;
   final String? headline;
+  final Function(String? value) onSelect;
+
   const CustomDropdown({
     Key? key,
     required this.options,
     this.headline,
+    required this.onSelect,
   }) : super(key: key);
 
   @override
@@ -64,6 +67,7 @@ class _CustomDropdownState extends State<CustomDropdown> {
                         setState(() {
                           selected = value;
                         });
+                        widget.onSelect(value);
                       },
                       isExpanded: true,
                       iconEnabledColor: AppTheme.primaryColor,

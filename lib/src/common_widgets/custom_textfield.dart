@@ -7,11 +7,13 @@ class CustomTextField extends StatelessWidget {
   final String hint;
   final String? headline;
   final int? maxLines;
+  final TextEditingController controller;
   const CustomTextField({
     Key? key,
     required this.hint,
     this.headline,
     this.maxLines,
+    required this.controller,
   }) : super(key: key);
 
   @override
@@ -44,6 +46,7 @@ class CustomTextField extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(10),
                 child: TextField(
+                  controller: controller,
                   maxLines: maxLines,
                   style: AppTypography.input,
                   decoration: InputDecoration(

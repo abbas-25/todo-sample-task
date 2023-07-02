@@ -1,13 +1,14 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'dart:developer';
 
 import 'package:appwrite/appwrite.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 
 import 'package:todo_sample/src/config/app_theme.dart';
-import 'package:todo_sample/src/config/database_constants.dart';
+import 'package:todo_sample/src/providers/edit_tasks_provider.dart';
+import 'package:todo_sample/src/providers/tasks_list_provider.dart';
 import 'package:todo_sample/src/routes/app_router.dart';
 import 'package:todo_sample/src/views/home/home_page.dart';
 
@@ -23,27 +24,13 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  late Databases db;
+  late TasksListProvider tasksListProvider;
   @override
   void initState() {
-    addSampleTodoToTestingCollection();
+    db = Databases(widget.client);
+    tasksListProvider = TasksListProvider(db: db);
     super.initState();
-  }
-
-  /// Purpose - only to check a valid appwrite connection
-  addSampleTodoToTestingCollection() {
-    try {
-      final db = Databases(widget.client);
-      db.createDocument(
-        databaseId: primaryDatabaseId,
-        collectionId: testingCollectionId,
-        documentId: ID.unique(),
-        data: {
-          "title": "testing appwrite collection write"
-        },
-      );
-    } catch (exception) {
-      log("Error Logged in Appwrite call addSampleTodoToTestingCollection  - $exception");
-    }
   }
 
   @override
@@ -56,16 +43,24 @@ class _MyAppState extends State<MyApp> {
       statusBarIconBrightness: Brightness.light,
     ));
 
-    return ScreenUtilInit(
-        designSize: const Size(360, 640),
-        builder: (context, _) {
-          return MaterialApp(
-            title: "Todo App",
-            theme: AppTheme.light,
-            debugShowCheckedModeBanner: false,
-            onGenerateRoute: AppRouter.generateRoute(),
-            home: const HomePage(),
-          );
-        });
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => tasksListProvider),
+        ChangeNotifierProvider(
+            create: (context) =>
+                EditTaskProvider(db: db, tasksListProvider: tasksListProvider)),
+      ],
+      child: ScreenUtilInit(
+          designSize: const Size(360, 640),
+          builder: (context, _) {
+            return MaterialApp(
+              title: "Todo App",
+              theme: AppTheme.light,
+              debugShowCheckedModeBanner: false,
+              onGenerateRoute: AppRouter.generateRoute(),
+              home: const HomePage(),
+            );
+          }),
+    );
   }
 }

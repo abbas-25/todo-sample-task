@@ -1,10 +1,12 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 
 import 'package:todo_sample/src/common_widgets/page_header.dart';
 import 'package:todo_sample/src/common_widgets/primary_appbar.dart';
 import 'package:todo_sample/src/config/app_theme.dart';
+import 'package:todo_sample/src/providers/edit_tasks_provider.dart';
 import 'package:todo_sample/src/utils/utils.dart';
 import 'package:todo_sample/src/views/task_details/widgets/single_task_preview_detail_widget.dart';
 
@@ -21,42 +23,63 @@ class TaskDetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _buildAppBar(),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Column(
+      body: Consumer<EditTaskProvider>(
+        builder: (context, prov, __) {
+          return Stack(
             children: [
-              _buildPageHeader(),
-              const SizedBox(height: 32),
-              SingleTaskPreviewDetailWidget(
-                title: "Task",
-                value: task.title,
-                showDivider: true,
+              Positioned.fill(
+                child: IgnorePointer(
+                  ignoring: prov.isProcessing,
+                  child: Opacity(
+                    opacity: prov.isProcessing ? 0.5 : 1,
+                    child: SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildPageHeader(context),
+                            const SizedBox(height: 32),
+                            SingleTaskPreviewDetailWidget(
+                              title: "Task",
+                              value: task.title,
+                              showDivider: true,
+                            ),
+                            SingleTaskPreviewDetailWidget(
+                              title: "Type",
+                              value:
+                                  Utils.capitalizeWord(task.getTaskTypeString),
+                              showDivider: true,
+                            ),
+                            SingleTaskPreviewDetailWidget(
+                              title: "Priority",
+                              value: Utils.capitalizeWord(
+                                  task.getTaskPriorityString),
+                              showDivider: true,
+                            ),
+                            SingleTaskPreviewDetailWidget(
+                              title: "Timeframe",
+                              value: Utils.capitalizeWord(task.timeframe),
+                              showDivider: true,
+                            ),
+                            SingleTaskPreviewDetailWidget(
+                              title: "Description",
+                              value: task.description,
+                              showDivider: false,
+                            ),
+                            const SizedBox(height: 50)
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               ),
-              SingleTaskPreviewDetailWidget(
-                title: "Type",
-                value: Utils.capitalizeWord(task.getTaskTypeString),
-                showDivider: true,
-              ),
-              SingleTaskPreviewDetailWidget(
-                title: "Priority",
-                value: Utils.capitalizeWord(task.getTaskPriorityString),
-                showDivider: true,
-              ),
-              SingleTaskPreviewDetailWidget(
-                title: "Timeframe",
-                value: Utils.capitalizeWord(task.timeframe),
-                showDivider: true,
-              ),
-              SingleTaskPreviewDetailWidget(
-                title: "Description",
-                value: task.description,
-                showDivider: false,
-              ),
-              const SizedBox(height:50)
+              if (prov.isProcessing)
+                const Center(child: CircularProgressIndicator()),
             ],
-          ),
-        ),
+          );
+        },
       ),
     );
   }
@@ -66,10 +89,14 @@ class TaskDetailsPage extends StatelessWidget {
         preferredSize: Size(double.infinity, 65), child: PrimaryAppBar());
   }
 
-  PageHeader _buildPageHeader() {
+  PageHeader _buildPageHeader(BuildContext context) {
     return PageHeader(
       title: "Task Preview",
       trailingIcon: InkWell(
+        onTap: () {
+          Provider.of<EditTaskProvider>(context, listen: false)
+              .deleteDocument(task).then((value) => Navigator.of(context).pop());
+        },
         child: Container(
           height: 48,
           width: 48,
