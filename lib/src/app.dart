@@ -7,7 +7,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 import 'package:todo_sample/src/config/app_theme.dart';
+import 'package:todo_sample/src/providers/edit_goals_provider.dart';
 import 'package:todo_sample/src/providers/edit_tasks_provider.dart';
+import 'package:todo_sample/src/providers/goals_list_provider.dart';
+import 'package:todo_sample/src/providers/home_provider.dart';
 import 'package:todo_sample/src/providers/tasks_list_provider.dart';
 import 'package:todo_sample/src/routes/app_router.dart';
 import 'package:todo_sample/src/views/home/home_page.dart';
@@ -26,10 +29,12 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   late Databases db;
   late TasksListProvider tasksListProvider;
+  late GoalsListProvider goalsListProvider;
   @override
   void initState() {
     db = Databases(widget.client);
     tasksListProvider = TasksListProvider(db: db);
+    goalsListProvider = GoalsListProvider(db: db);
     super.initState();
   }
 
@@ -46,9 +51,17 @@ class _MyAppState extends State<MyApp> {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => tasksListProvider),
+        ChangeNotifierProvider(create: (context) => goalsListProvider),
+        ChangeNotifierProvider(
+            create: (context) => HomeProvider(
+                tasksListProvider: tasksListProvider,
+                goalsListProvider: goalsListProvider)),
         ChangeNotifierProvider(
             create: (context) =>
                 EditTaskProvider(db: db, tasksListProvider: tasksListProvider)),
+        ChangeNotifierProvider(
+            create: (context) => EditGoalsProvider(
+                db: db, goalsListProvider: goalsListProvider)),
       ],
       child: ScreenUtilInit(
           designSize: const Size(360, 640),

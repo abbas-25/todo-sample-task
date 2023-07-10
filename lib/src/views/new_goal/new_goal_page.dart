@@ -7,22 +7,20 @@ import 'package:todo_sample/src/common_widgets/custom_textfield.dart';
 import 'package:todo_sample/src/common_widgets/page_header.dart';
 import 'package:todo_sample/src/common_widgets/primary_appbar.dart';
 import 'package:todo_sample/src/common_widgets/primary_button.dart';
-import 'package:todo_sample/src/models/task.dart';
-import 'package:todo_sample/src/providers/edit_tasks_provider.dart';
+import 'package:todo_sample/src/models/goal.dart';
+import 'package:todo_sample/src/providers/edit_goals_provider.dart';
 
-class NewTaskPage extends StatefulWidget {
-  const NewTaskPage({super.key});
+class NewGoalPage extends StatefulWidget {
+  const NewGoalPage({super.key});
 
   @override
-  State<NewTaskPage> createState() => _NewTaskPageState();
+  State<NewGoalPage> createState() => _NewGoalPageState();
 }
 
-class _NewTaskPageState extends State<NewTaskPage> {
+class _NewGoalPageState extends State<NewGoalPage> {
   TextEditingController titleController = TextEditingController();
   TextEditingController descController = TextEditingController();
   String? type;
-  String? priority;
-  String? timeframe;
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +30,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
       },
       child: Scaffold(
         appBar: _buildAppBar(),
-        body: Consumer<EditTaskProvider>(builder: (context, prov, _) {
+        body: Consumer<EditGoalsProvider>(builder: (context, prov, _) {
           return Stack(
             children: [
               Positioned.fill(
@@ -48,7 +46,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
                             _buildPageHeader(),
                             const SizedBox(height: 32),
                             CustomTextField(
-                                headline: "Task",
+                                headline: "Goal",
                                 hint: "Text",
                                 controller: titleController),
                             gap,
@@ -63,33 +61,6 @@ class _NewTaskPageState extends State<NewTaskPage> {
                                   type = v;
                                 }),
                             gap,
-                            CustomDropdown(
-                                headline: "Priority",
-                                options: const [
-                                  "Needs done",
-                                  "Nice to have",
-                                  "Nice Idea"
-                                ],
-                                onSelect: (v) {
-                                  priority = v;
-                                }),
-                            gap,
-                            CustomDropdown(
-                                headline: "Timeframe",
-                                options: const [
-                                  "None",
-                                  "Today",
-                                  "3 days",
-                                  "Week",
-                                  "Fortnight",
-                                  "Month",
-                                  "90 Days",
-                                  "Year"
-                                ],
-                                onSelect: (v) {
-                                  timeframe = v;
-                                }),
-                            gap,
                             CustomTextField(
                                 headline: "Description",
                                 controller: descController,
@@ -102,8 +73,6 @@ class _NewTaskPageState extends State<NewTaskPage> {
                               title: "Submit",
                               onTap: () {
                                 if (type == null ||
-                                    priority == null ||
-                                    timeframe == null ||
                                     titleController.text.trim().isEmpty ||
                                     descController.text.trim().isEmpty) {
                                   // todo add toast here to
@@ -111,13 +80,11 @@ class _NewTaskPageState extends State<NewTaskPage> {
                                 }
 
                                 prov
-                                    .createTaskFromDb(
-                                        task: Task(
+                                    .createGoalFromDb(
+                                        goal: Goal(
                                       id: "",
                                       title: titleController.text.trim(),
                                       type: type!,
-                                      priority: priority!,
-                                      timeframe: timeframe!,
                                       description: descController.text.trim(),
                                     ))
                                     .then(
@@ -150,7 +117,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
 
   PageHeader _buildPageHeader() {
     return const PageHeader(
-      title: "New Task",
+      title: "New Goal",
     );
   }
 }

@@ -1,25 +1,24 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
-
 import 'package:todo_sample/src/config/app_theme.dart';
 import 'package:todo_sample/src/config/typography.dart';
-import 'package:todo_sample/src/models/menu.dart';
+import 'package:todo_sample/src/models/goal.dart';
 
-class SingleMenuItemWidget extends StatelessWidget {
- final MenuItem item;
- final int itemCount;
-  const SingleMenuItemWidget({
+import 'package:todo_sample/src/routes/routes.dart';
+import 'package:todo_sample/src/utils/utils.dart';
+
+class SingleGoalTileWidget extends StatelessWidget {
+  final Goal goal;
+  const SingleGoalTileWidget({
     Key? key,
-    required this.item,
-    required this.itemCount,
+    required this.goal,
   }) : super(key: key);
-
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Navigator.of(context).pushNamed(item.route);
+        Navigator.of(context).pushNamed(Routes.goalDetails, arguments: goal);
       },
       child: Container(
         decoration: BoxDecoration(
@@ -44,21 +43,26 @@ class SingleMenuItemWidget extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(24, 16, 16, 20),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Image.asset(item.image, height: 28, width: 28),
-              const SizedBox(width: 24),
-              Column(
-                children: [
-                  Text(
-                    item.title,
-                    style: AppTypography.title,
-                  ),
-                  const SizedBox(height: 2),
-                  Text("$itemCount ${item.title}"),
-                ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      goal.title,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTypography.title2,
+                      maxLines: 1,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(Utils.capitalizeWord(goal.type),
+                        style: AppTypography.caption.copyWith(
+                          color: const Color(0xff808080),
+                        )),
+                  ],
+                ),
               ),
-              const Spacer(),
+              const SizedBox(width: 16),
               Icon(Icons.arrow_forward_ios_rounded,
                   color: AppTheme.primaryColor, size: 18)
             ],
