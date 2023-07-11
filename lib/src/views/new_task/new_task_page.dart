@@ -25,7 +25,6 @@ class _NewTaskPageState extends State<NewTaskPage> {
   String? type;
   String? priority;
   String? timeframe;
-  Goal? goal;
 
   @override
   void initState() {
@@ -39,149 +38,139 @@ class _NewTaskPageState extends State<NewTaskPage> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        FocusScope.of(context).unfocus();
-      },
-      child: Scaffold(
-        appBar: _buildAppBar(),
-        body: ValueListenableBuilder(
-            valueListenable: provider.isFirstLoading,
-            builder: (context, _, __) {
-              return provider.isFirstLoading.value
-                  ? const Center(
-                      child: CircularProgressIndicator(),
-                    )
-                  : Consumer<EditTaskProvider>(builder: (context, prov, _) {
-                      return Stack(
-                        children: [
-                          Positioned.fill(
-                            child: IgnorePointer(
-                              ignoring: prov.isProcessing ? true : false,
-                              child: Opacity(
-                                opacity: prov.isProcessing ? 0.5 : 1,
-                                child: SingleChildScrollView(
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 16),
-                                    child: Column(
-                                      children: [
-                                        _buildPageHeader(),
-                                        const SizedBox(height: 32),
-                                        CustomTextField(
-                                            headline: "Task",
-                                            hint: "Text",
-                                            controller: titleController),
-                                        gap,
-                                        CustomDropdown<String>(
-                                            headline: "Type",
-                                            selectedValue: type,
-                                            options: const [
-                                              "Work",
-                                              "Personal Project",
-                                              "Self"
-                                            ],
-                                            onChanged: (v) {
-                                              type = v;
-                                            }),
-                                        gap,
-                                        CustomDropdown<String>(
-                                            selectedValue: priority,
-                                            headline: "Priority",
-                                            options: const [
-                                              "Needs done",
-                                              "Nice to have",
-                                              "Nice Idea"
-                                            ],
-                                            onChanged: (v) {
-                                              priority = v;
-                                            }),
-                                        gap,
-                                        CustomDropdown<String>(
-                                            selectedValue: timeframe,
-                                            headline: "Timeframe",
-                                            options: const [
-                                              "None",
-                                              "Today",
-                                              "3 days",
-                                              "Week",
-                                              "Fortnight",
-                                              "Month",
-                                              "90 Days",
-                                              "Year"
-                                            ],
-                                            onChanged: (v) {
-                                              timeframe = v;
-                                            }),
-                                        gap,
-                                        CustomTextField(
-                                            headline: "Description",
-                                            controller: descController,
-                                            hint: "",
-                                            maxLines: 4),
-                                        gap,
-                                        CustomDropdown<Goal>(
-                                          selectedValue: goal,
-                                          headline: "Goals",
-                                          onChanged: (g) {
-                                            goal = g;
-                                          },
-                                          options: provider.goalsForDropdown,
-                                        ),
-                                        const SizedBox(
-                                          height: 64,
-                                        ),
-                                        PrimaryButton(
-                                          title: "Submit",
-                                          onTap: () {
-                                            if (type == null ||
-                                                priority == null ||
-                                                timeframe == null ||
-                                                goal == null ||
-                                                titleController.text
-                                                    .trim()
-                                                    .isEmpty ||
-                                                descController.text
-                                                    .trim()
-                                                    .isEmpty) {
-                                              // todo add toast here to
-                                              return;
-                                            }
-
-                                            prov
-                                                .createTaskFromDb(
-                                                    task: Task(
-                                                  id: "",
-                                                  goal: goal!,
-                                                  title: titleController.text
-                                                      .trim(),
-                                                  type: type!,
-                                                  priority: priority!,
-                                                  timeframe: timeframe!,
-                                                  description: descController
-                                                      .text
-                                                      .trim(),
-                                                ))
-                                                .then((value) =>
-                                                    Navigator.of(context)
-                                                        .pop());
-                                          },
-                                        ),
-                                        const SizedBox(height: 100)
-                                      ],
-                                    ),
-                                  ),
+        onTap: () {
+          FocusScope.of(context).unfocus();
+        },
+        child: Scaffold(
+            appBar: _buildAppBar(),
+            body: Consumer<EditTaskProvider>(builder: (context, prov, _) {
+              return Stack(
+                children: [
+                  Positioned.fill(
+                    child: IgnorePointer(
+                      ignoring: prov.isProcessing ? true : false,
+                      child: Opacity(
+                        opacity: prov.isProcessing ? 0.5 : 1,
+                        child: SingleChildScrollView(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Column(
+                              children: [
+                                _buildPageHeader(),
+                                const SizedBox(height: 32),
+                                CustomTextField(
+                                    headline: "Task",
+                                    hint: "Text",
+                                    controller: titleController),
+                                gap,
+                                CustomDropdown<String>(
+                                    headline: "Type",
+                                    selectedValue: type,
+                                    options: const [
+                                      "Work",
+                                      "Personal Project",
+                                      "Self"
+                                    ],
+                                    onChanged: (v) {
+                                      provider.chosenGoal = null;
+                                      provider.updateGoals(v);
+                                      type = v;
+                                    }),
+                                gap,
+                                CustomDropdown<String>(
+                                    selectedValue: priority,
+                                    headline: "Priority",
+                                    options: const [
+                                      "Needs done",
+                                      "Nice to have",
+                                      "Nice Idea"
+                                    ],
+                                    onChanged: (v) {
+                                      priority = v;
+                                    }),
+                                gap,
+                                CustomDropdown<String>(
+                                    selectedValue: timeframe,
+                                    headline: "Timeframe",
+                                    options: const [
+                                      "None",
+                                      "Today",
+                                      "3 days",
+                                      "Week",
+                                      "Fortnight",
+                                      "Month",
+                                      "90 Days",
+                                      "Year"
+                                    ],
+                                    onChanged: (v) {
+                                      timeframe = v;
+                                    }),
+                                gap,
+                                CustomTextField(
+                                    headline: "Description",
+                                    controller: descController,
+                                    hint: "",
+                                    maxLines: 4),
+                                gap,
+                                ValueListenableBuilder(
+                                    valueListenable: provider.isGoalsUpdating,
+                                    builder: (context, _, __) {
+                                      return provider.isGoalsUpdating.value
+                                          ? const Text("Updating Goals...")
+                                          : CustomDropdown<Goal>(
+                                              selectedValue: provider.chosenGoal,
+                                              headline: "Goals",
+                                              onChanged: (g) {
+                                                provider.chosenGoal = g;
+                                              },
+                                              options:
+                                                  provider.goalsForDropdown,
+                                            );
+                                    }),
+                                const SizedBox(
+                                  height: 64,
                                 ),
-                              ),
+                                PrimaryButton(
+                                  title: "Submit",
+                                  onTap: () {
+                                    if (type == null ||
+                                        priority == null ||
+                                        timeframe == null ||
+                                        titleController.text.trim().isEmpty ||
+                                        descController.text.trim().isEmpty) {
+                                      // todo add toast here to
+                                      return;
+                                    }
+
+                                    prov
+                                        .createTaskFromDb(
+                                            task: Task(
+                                          id: "", // not used in creation
+                                          goalId: provider.chosenGoal?.id,
+                                          title: titleController.text.trim(),
+                                          type: type!,
+                                          priority: priority!,
+                                          timeframe: timeframe!,
+                                          description:
+                                              descController.text.trim(),
+                                        ))
+                                        .then((value) =>
+                                            Navigator.of(context).pop());
+                                  },
+                                ),
+                                const SizedBox(height: 100)
+                              ],
                             ),
                           ),
-                          if (prov.isProcessing)
-                            const Center(child: CircularProgressIndicator()),
-                        ],
-                      );
-                    });
-            }),
-      ),
-    );
+                        ),
+                      ),
+                    ),
+                  ),
+                  if (prov.isProcessing)
+                    const Center(child: CircularProgressIndicator()),
+                ],
+              );
+            })));
   }
 
   SizedBox get gap => const SizedBox(height: 24);

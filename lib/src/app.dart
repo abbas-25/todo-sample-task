@@ -11,6 +11,7 @@ import 'package:todo_sample/src/providers/edit_goals_provider.dart';
 import 'package:todo_sample/src/providers/edit_tasks_provider.dart';
 import 'package:todo_sample/src/providers/goals_list_provider.dart';
 import 'package:todo_sample/src/providers/home_provider.dart';
+import 'package:todo_sample/src/providers/task_details_provider.dart';
 import 'package:todo_sample/src/providers/tasks_list_provider.dart';
 import 'package:todo_sample/src/routes/app_router.dart';
 import 'package:todo_sample/src/views/home/home_page.dart';
@@ -62,6 +63,9 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(
             create: (context) => EditGoalsProvider(
                 db: db, goalsListProvider: goalsListProvider)),
+        ChangeNotifierProvider(
+            create: (context) => TaskDetailsProvider(
+                db: db)),
       ],
       child: ScreenUtilInit(
           designSize: const Size(360, 640),

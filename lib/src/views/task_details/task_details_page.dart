@@ -7,17 +7,35 @@ import 'package:todo_sample/src/common_widgets/page_header.dart';
 import 'package:todo_sample/src/common_widgets/primary_appbar.dart';
 import 'package:todo_sample/src/config/app_theme.dart';
 import 'package:todo_sample/src/providers/edit_tasks_provider.dart';
+import 'package:todo_sample/src/providers/task_details_provider.dart';
 import 'package:todo_sample/src/utils/utils.dart';
 import 'package:todo_sample/src/views/task_details/widgets/single_task_preview_detail_widget.dart';
 
 import '../../models/task.dart';
 
-class TaskDetailsPage extends StatelessWidget {
+class TaskDetailsPage extends StatefulWidget {
   final Task task;
   const TaskDetailsPage({
     Key? key,
     required this.task,
   }) : super(key: key);
+
+  @override
+  State<TaskDetailsPage> createState() => _TaskDetailsPageState();
+}
+
+class _TaskDetailsPageState extends State<TaskDetailsPage> {
+  late TaskDetailsProvider detailsProvider;
+  @override
+  void initState() {
+    detailsProvider = Provider.of<TaskDetailsProvider>(context, listen: false);
+    Future.delayed(Duration.zero, () {
+      if (widget.task.goalId != null) {
+        detailsProvider.fetchGoal(widget.task.goalId!);
+      }
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,36 +60,47 @@ class TaskDetailsPage extends StatelessWidget {
                             const SizedBox(height: 32),
                             SingleTaskPreviewDetailWidget(
                               title: "Task",
-                              value: task.title,
+                              value: widget.task.title,
                               showDivider: true,
                             ),
                             SingleTaskPreviewDetailWidget(
                               title: "Type",
-                              value:
-                                  Utils.capitalizeWord(task.getTaskTypeString),
+                              value: Utils.capitalizeWord(
+                                  widget.task.getTaskTypeString),
                               showDivider: true,
                             ),
                             SingleTaskPreviewDetailWidget(
                               title: "Priority",
                               value: Utils.capitalizeWord(
-                                  task.getTaskPriorityString),
+                                  widget.task.getTaskPriorityString),
                               showDivider: true,
                             ),
                             SingleTaskPreviewDetailWidget(
                               title: "Timeframe",
-                              value: Utils.capitalizeWord(task.timeframe),
+                              value:
+                                  Utils.capitalizeWord(widget.task.timeframe),
                               showDivider: true,
                             ),
                             SingleTaskPreviewDetailWidget(
                               title: "Description",
-                              value: task.description,
-                              showDivider: true,
+                              value: widget.task.description,
+                              showDivider: true ,
                             ),
-                            SingleTaskPreviewDetailWidget(
-                              title: "Goal",
-                              value: task.goal.toString(),
-                              showDivider: false,
-                            ),
+                            if (widget.task.goalId != null)
+                              ValueListenableBuilder(
+                                  valueListenable:
+                                      detailsProvider.isLoadingGoal,
+                                  builder: (context, _, __) {
+                                    return detailsProvider.goal.value == null ||
+                                            detailsProvider.isLoadingGoal.value
+                                        ? const Text('')
+                                        : SingleTaskPreviewDetailWidget(
+                                            title: "Goal",
+                                            value: detailsProvider
+                                                .goal.value?.title ?? "",
+                                            showDivider: false,
+                                          );
+                                  }),
                             const SizedBox(height: 50)
                           ],
                         ),
@@ -100,7 +129,8 @@ class TaskDetailsPage extends StatelessWidget {
       trailingIcon: InkWell(
         onTap: () {
           Provider.of<EditTaskProvider>(context, listen: false)
-              .deleteDocument(task).then((value) => Navigator.of(context).pop());
+              .deleteDocument(widget.task)
+              .then((value) => Navigator.of(context).pop());
         },
         child: Container(
           height: 48,

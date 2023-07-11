@@ -3,8 +3,6 @@ import 'dart:convert';
 
 import 'package:appwrite/models.dart';
 
-import 'package:todo_sample/src/models/goal.dart';
-
 class Task {
   final String id;
   final String title;
@@ -12,7 +10,7 @@ class Task {
   final String priority;
   final String timeframe;
   final String description;  
-  final Goal? goal;
+  final String? goalId;
   Task({
     required this.id,
     required this.title,
@@ -20,7 +18,7 @@ class Task {
     required this.priority,
     required this.timeframe,
     required this.description,
-    this.goal,
+    this.goalId,
   });
 
   String get getTaskPriorityString => priority.replaceAll("_", " ");
@@ -33,7 +31,7 @@ class Task {
     String? priority,
     String? timeframe,
     String? description,
-    Goal? goal,
+    String? goalId,
   }) {
     return Task(
       id: id ?? this.id,
@@ -42,7 +40,7 @@ class Task {
       priority: priority ?? this.priority,
       timeframe: timeframe ?? this.timeframe,
       description: description ?? this.description,
-      goal: goal ?? this.goal,
+      goalId: goalId ?? this.goalId,
     );
   }
 
@@ -53,7 +51,7 @@ class Task {
       'priority': priority,
       'timeframe': timeframe,
       'description': description,
-      'goal': goal?.toMap(),
+      'goalId': goalId,
     };
   }
 
@@ -65,7 +63,7 @@ class Task {
       priority: map['priority'] as String,
       timeframe: map['timeframe'] as String,
       description: map['description'] as String,
-      goal: map['goal'] != null ? Goal.fromMap(map['goal'] as Map<String,dynamic>) : null,
+      goalId: map['goalId'] != null ? map['goalId'] as String : null,
     );
   }
   
@@ -78,7 +76,7 @@ class Task {
       priority: data['priority'] as String,
       timeframe: data['timeframe'] as String,
       description: data['description'] as String,
-      goal: Goal.fromMap(data['goal']),
+      goalId: data['goalId'] as String?,
     );
   }
 
@@ -88,7 +86,7 @@ class Task {
 
   @override
   String toString() {
-    return 'Task(id: $id, title: $title, type: $type, priority: $priority, timeframe: $timeframe, description: $description, goal: $goal)';
+    return 'Task(id: $id, title: $title, type: $type, priority: $priority, timeframe: $timeframe, description: $description, goalId: $goalId)';
   }
 
   @override
@@ -102,7 +100,7 @@ class Task {
       other.priority == priority &&
       other.timeframe == timeframe &&
       other.description == description &&
-      other.goal == goal;
+      other.goalId == goalId;
   }
 
   @override
@@ -113,6 +111,6 @@ class Task {
       priority.hashCode ^
       timeframe.hashCode ^
       description.hashCode ^
-      goal.hashCode;
+      goalId.hashCode;
   }
 }

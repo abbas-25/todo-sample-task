@@ -14,8 +14,10 @@ class EditTaskProvider with ChangeNotifier {
   final Databases db;
   final TasksListProvider tasksListProvider;
   final GoalsListProvider goalsListProvider;
-  ValueNotifier isFirstLoading = ValueNotifier(true);
+  ValueNotifier isGoalsUpdating = ValueNotifier(true);
   List<Goal> goalsForDropdown = [];
+  List<Goal> allGoals = [];
+  Goal? chosenGoal;
 
   EditTaskProvider({
     required this.db,
@@ -32,14 +34,28 @@ class EditTaskProvider with ChangeNotifier {
 
   Future<List<Goal>> getGoalsForDropdown() async {
     try {
-      isFirstLoading.value = true;
+      isGoalsUpdating.value = true;
       goalsForDropdown = [];
-      return goalsForDropdown = await goalsListProvider.getGoalsFromDb();
+      allGoals = await goalsListProvider.getGoalsFromDb();
+      return goalsForDropdown = allGoals;
     } catch (exception) {
       return [];
     } finally {
-      isFirstLoading.value = false;
+      isGoalsUpdating.value = false;
     }
+  }
+
+  void updateGoals(String typeOfTaskChosen) {
+    chosenGoal = null;
+    goalsForDropdown = [];
+    isGoalsUpdating.value = true;
+    Future.delayed(const Duration(milliseconds: 500), () {
+      goalsForDropdown = allGoals
+          .where((element) =>
+              element.type.toLowerCase() == typeOfTaskChosen.toLowerCase())
+          .toList();
+      isGoalsUpdating.value = false;
+    });
   }
 
   Future<void> createTaskFromDb({
