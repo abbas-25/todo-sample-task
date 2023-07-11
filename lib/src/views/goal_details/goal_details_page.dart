@@ -46,6 +46,11 @@ class GoalDetailPage extends StatelessWidget {
                               showDivider: true,
                             ),
                             SingleTaskPreviewDetailWidget(
+                              title: "Type",
+                              value: goal.type,
+                              showDivider: true,
+                            ),
+                            SingleTaskPreviewDetailWidget(
                               title: "Description",
                               value: goal.description,
                               showDivider: false,

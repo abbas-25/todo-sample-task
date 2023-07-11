@@ -58,7 +58,7 @@ class _MyAppState extends State<MyApp> {
                 goalsListProvider: goalsListProvider)),
         ChangeNotifierProvider(
             create: (context) =>
-                EditTaskProvider(db: db, tasksListProvider: tasksListProvider)),
+                EditTaskProvider(db: db, tasksListProvider: tasksListProvider, goalsListProvider: goalsListProvider)),
         ChangeNotifierProvider(
             create: (context) => EditGoalsProvider(
                 db: db, goalsListProvider: goalsListProvider)),

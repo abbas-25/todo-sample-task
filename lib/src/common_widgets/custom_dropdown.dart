@@ -4,24 +4,26 @@ import 'package:flutter/material.dart';
 import 'package:todo_sample/src/config/app_theme.dart';
 import 'package:todo_sample/src/config/typography.dart';
 
-class CustomDropdown extends StatefulWidget {
-  final List<String> options;
+class CustomDropdown<T> extends StatefulWidget {
+  final List<T> options;
   final String? headline;
-  final Function(String? value) onSelect;
+  final T? selectedValue;
+  final Function(T) onChanged;
 
   const CustomDropdown({
     Key? key,
     required this.options,
     this.headline,
-    required this.onSelect,
+    required this.selectedValue,
+    required this.onChanged,
   }) : super(key: key);
 
   @override
-  State<CustomDropdown> createState() => _CustomDropdownState();
+  State<CustomDropdown<T>> createState() => _CustomDropdownState<T>();
 }
 
-class _CustomDropdownState extends State<CustomDropdown> {
-  String? selected;
+class _CustomDropdownState<T> extends State<CustomDropdown<T>> {
+  T? selected;
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -55,19 +57,21 @@ class _CustomDropdownState extends State<CustomDropdown> {
                 child: Center(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: DropdownButton<String>(
+                    child: DropdownButton<T>(
                       icon: const Icon(Icons.keyboard_arrow_down_rounded),
                       items: widget.options
-                          .map((e) => DropdownMenuItem<String>(
+                          .map((e) => DropdownMenuItem<T>(
                               value: e,
-                              child: Text(e, style: AppTypography.dropdown)))
+                              child: Text(e.toString(),
+                                  style: AppTypography.dropdown)))
                           .toList(),
                       value: selected,
-                      onChanged: (value) {
-                        setState(() {
-                          selected = value;
-                        });
-                        widget.onSelect(value);
+                      onChanged: (v) {
+                        if (v != null) {
+                          widget.onChanged(v);
+                          selected = v;
+                          setState(() {});
+                        }
                       },
                       isExpanded: true,
                       iconEnabledColor: AppTheme.primaryColor,

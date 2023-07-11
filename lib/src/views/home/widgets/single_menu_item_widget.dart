@@ -1,19 +1,17 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 
-import 'package:todo_sample/src/config/app_theme.dart';
 import 'package:todo_sample/src/config/typography.dart';
 import 'package:todo_sample/src/models/menu.dart';
 
 class SingleMenuItemWidget extends StatelessWidget {
- final MenuItem item;
- final int itemCount;
+  final MenuItem item;
+  final int itemCount;
   const SingleMenuItemWidget({
     Key? key,
     required this.item,
     required this.itemCount,
   }) : super(key: key);
-
 
   @override
   Widget build(BuildContext context) {
@@ -41,28 +39,25 @@ class SingleMenuItemWidget extends StatelessWidget {
                 spreadRadius: 0,
               )
             ]),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 16, 16, 20),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Image.asset(item.image, height: 28, width: 28),
-              const SizedBox(width: 24),
-              Column(
-                children: [
-                  Text(
-                    item.title,
-                    style: AppTypography.title,
-                  ),
-                  const SizedBox(height: 2),
-                  Text("$itemCount ${item.title}"),
-                ],
-              ),
-              const Spacer(),
-              Icon(Icons.arrow_forward_ios_rounded,
-                  color: AppTheme.primaryColor, size: 18)
-            ],
-          ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const SizedBox(width: 24),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.title,
+                  style: AppTypography.title.copyWith(fontSize: 24),
+                ),
+                const SizedBox(height: 2),
+                Text("$itemCount ${item.title}", style: AppTypography.caption),
+              ],
+            ),
+            const Spacer(),
+            Image.asset(item.image, fit: BoxFit.cover, height: 120,),
+            const SizedBox(width: 32)
+          ],
         ),
       ),
     );

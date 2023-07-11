@@ -32,7 +32,7 @@ class Goal {
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
-      'id': id,
+      '\$id': id, 
       'title': title,
       'type': type,
       'description': description,
@@ -41,7 +41,7 @@ class Goal {
 
   factory Goal.fromMap(Map<String, dynamic> map) {
     return Goal(
-      id: map['id'] as String,
+      id: map['\$id'] as String,
       title: map['title'] as String,
       type: map['type'] as String,
       description: map['description'] as String,
@@ -64,7 +64,7 @@ class Goal {
 
   @override
   String toString() {
-    return 'Goal(id: $id, title: $title, type: $type, description: $description)';
+    return title;
   }
 
   @override

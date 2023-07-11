@@ -50,14 +50,15 @@ class _NewGoalPageState extends State<NewGoalPage> {
                                 hint: "Text",
                                 controller: titleController),
                             gap,
-                            CustomDropdown(
+                            CustomDropdown<String>(
                                 headline: "Type",
                                 options: const [
                                   "Work",
                                   "Personal Project",
                                   "Self"
                                 ],
-                                onSelect: (v) {
+                                selectedValue: type,
+                                onChanged: (v) {
                                   type = v;
                                 }),
                             gap,

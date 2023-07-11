@@ -5,15 +5,22 @@ import 'package:appwrite/appwrite.dart';
 import 'package:flutter/material.dart';
 
 import 'package:todo_sample/src/config/database_constants.dart';
+import 'package:todo_sample/src/models/goal.dart';
 import 'package:todo_sample/src/models/task.dart';
+import 'package:todo_sample/src/providers/goals_list_provider.dart';
 import 'package:todo_sample/src/providers/tasks_list_provider.dart';
 
 class EditTaskProvider with ChangeNotifier {
   final Databases db;
   final TasksListProvider tasksListProvider;
+  final GoalsListProvider goalsListProvider;
+  ValueNotifier isFirstLoading = ValueNotifier(true);
+  List<Goal> goalsForDropdown = [];
+
   EditTaskProvider({
     required this.db,
     required this.tasksListProvider,
+    required this.goalsListProvider,
   });
 
   bool isProcessing = false;
@@ -21,6 +28,18 @@ class EditTaskProvider with ChangeNotifier {
   void switchProcessingState(bool newState) {
     isProcessing = newState;
     notifyListeners();
+  }
+
+  Future<List<Goal>> getGoalsForDropdown() async {
+    try {
+      isFirstLoading.value = true;
+      goalsForDropdown = [];
+      return goalsForDropdown = await goalsListProvider.getGoalsFromDb();
+    } catch (exception) {
+      return [];
+    } finally {
+      isFirstLoading.value = false;
+    }
   }
 
   Future<void> createTaskFromDb({

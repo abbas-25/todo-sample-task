@@ -65,6 +65,11 @@ class TaskDetailsPage extends StatelessWidget {
                             SingleTaskPreviewDetailWidget(
                               title: "Description",
                               value: task.description,
+                              showDivider: true,
+                            ),
+                            SingleTaskPreviewDetailWidget(
+                              title: "Goal",
+                              value: task.goal.toString(),
                               showDivider: false,
                             ),
                             const SizedBox(height: 50)
