@@ -16,6 +16,8 @@ class AppTheme {
       colorScheme: colorScheme,
       primaryColor: primaryColor,
       primaryColorDark: primaryColor,
+      appBarTheme:
+          const AppBarTheme(iconTheme: IconThemeData(color: Colors.black)),
       indicatorColor: Colors.white,
       cardColor: Colors.white,
       splashColor: Colors.white24,

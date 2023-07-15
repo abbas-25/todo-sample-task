@@ -21,7 +21,7 @@ class _HomePageState extends State<HomePage> {
         id: "id1",
         title: "Tasks",
         image: "assets/images/tasks-tile-icon.png",
-        route: Routes.tasksList),
+        route: Routes.todayTasksList),
     MenuItem(
         id: "id2",
         title: "Goals",

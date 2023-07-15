@@ -7,14 +7,14 @@ import 'package:todo_sample/src/routes/routes.dart';
 import 'package:todo_sample/src/views/tasks_list/widgets/single_task_tile_widget.dart';
 import 'package:todo_sample/src/common_widgets/page_header.dart';
 
-class TasksListPage extends StatefulWidget {
-  const TasksListPage({super.key});
+class TaskListPage extends StatefulWidget {
+  const TaskListPage({super.key});
 
   @override
-  State<TasksListPage> createState() => _TasksListPageState();
+  State<TaskListPage> createState() => TaskListPageState();
 }
 
-class _TasksListPageState extends State<TasksListPage> {
+class TaskListPageState extends State<TaskListPage> {
   @override
   void initState() {
     Future.delayed(Duration.zero, () {

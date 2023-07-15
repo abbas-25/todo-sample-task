@@ -7,6 +7,7 @@ import 'package:todo_sample/src/common_widgets/custom_textfield.dart';
 import 'package:todo_sample/src/common_widgets/page_header.dart';
 import 'package:todo_sample/src/common_widgets/primary_appbar.dart';
 import 'package:todo_sample/src/common_widgets/primary_button.dart';
+import 'package:todo_sample/src/config/database_constants.dart';
 import 'package:todo_sample/src/models/goal.dart';
 import 'package:todo_sample/src/models/task.dart';
 import 'package:todo_sample/src/providers/edit_tasks_provider.dart';
@@ -92,16 +93,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
                                 CustomDropdown<String>(
                                     selectedValue: timeframe,
                                     headline: "Timeframe",
-                                    options: const [
-                                      "None",
-                                      "Today",
-                                      "3 days",
-                                      "Week",
-                                      "Fortnight",
-                                      "Month",
-                                      "90 Days",
-                                      "Year"
-                                    ],
+                                    options: timeframes,
                                     onChanged: (v) {
                                       timeframe = v;
                                     }),
@@ -118,7 +110,8 @@ class _NewTaskPageState extends State<NewTaskPage> {
                                       return provider.isGoalsUpdating.value
                                           ? const Text("Updating Goals...")
                                           : CustomDropdown<Goal>(
-                                              selectedValue: provider.chosenGoal,
+                                              selectedValue:
+                                                  provider.chosenGoal,
                                               headline: "Goals",
                                               onChanged: (g) {
                                                 provider.chosenGoal = g;
@@ -142,20 +135,25 @@ class _NewTaskPageState extends State<NewTaskPage> {
                                       return;
                                     }
 
-                                    prov
-                                        .createTaskFromDb(
-                                            task: Task(
-                                          id: "", // not used in creation
-                                          goalId: provider.chosenGoal?.id,
-                                          title: titleController.text.trim(),
-                                          type: type!,
-                                          priority: priority!,
-                                          timeframe: timeframe!,
-                                          description:
-                                              descController.text.trim(),
-                                        ))
-                                        .then((value) =>
-                                            Navigator.of(context).pop());
+                                    var task = Task(
+                                      id: "", // not used in creation
+                                      createdAt: DateTime.now(),
+                                      isMarkedForToday: false,
+                                      goalId: provider.chosenGoal?.id,
+                                      expectedCompletion: null,
+                                      title: titleController.text.trim(),
+                                      type: type!,
+                                      priority: priority!,
+                                      timeframe: timeframe!,
+                                      description: descController.text.trim(),
+                                    );
+
+                                    task = task.copyWith(
+                                        expectedCompletion:
+                                            task.getExpectedDateFromTimeframe);
+
+                                    prov.createTaskFromDb(task: task).then(
+                                        (value) => Navigator.of(context).pop(true));
                                   },
                                 ),
                                 const SizedBox(height: 100)

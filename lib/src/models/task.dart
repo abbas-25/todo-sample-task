@@ -9,8 +9,11 @@ class Task {
   final String type;
   final String priority;
   final String timeframe;
-  final String description;  
+  final String description;
+  final DateTime createdAt;
+  final DateTime? expectedCompletion;
   final String? goalId;
+  final bool isMarkedForToday;
   Task({
     required this.id,
     required this.title,
@@ -18,7 +21,10 @@ class Task {
     required this.priority,
     required this.timeframe,
     required this.description,
+    required this.createdAt,
+    required this.expectedCompletion,
     this.goalId,
+    required this.isMarkedForToday,
   });
 
   String get getTaskPriorityString => priority.replaceAll("_", " ");
@@ -31,7 +37,10 @@ class Task {
     String? priority,
     String? timeframe,
     String? description,
+    DateTime? createdAt,
+    DateTime? expectedCompletion,
     String? goalId,
+    bool? isMarkedForToday,
   }) {
     return Task(
       id: id ?? this.id,
@@ -40,7 +49,10 @@ class Task {
       priority: priority ?? this.priority,
       timeframe: timeframe ?? this.timeframe,
       description: description ?? this.description,
+      createdAt: createdAt ?? this.createdAt,
+      expectedCompletion: expectedCompletion ?? this.expectedCompletion,
       goalId: goalId ?? this.goalId,
+      isMarkedForToday: isMarkedForToday ?? this.isMarkedForToday,
     );
   }
 
@@ -51,22 +63,13 @@ class Task {
       'priority': priority,
       'timeframe': timeframe,
       'description': description,
+      'createdAt': createdAt.toString(),
+      'expectedCompletion': expectedCompletion?.toString(),
       'goalId': goalId,
+      'isMarkedForToday': isMarkedForToday,
     };
   }
 
-  factory Task.fromMap(Map<String, dynamic> map) {
-    return Task(
-      id: map['id'] as String,
-      title: map['title'] as String,
-      type: map['type'] as String,
-      priority: map['priority'] as String,
-      timeframe: map['timeframe'] as String,
-      description: map['description'] as String,
-      goalId: map['goalId'] != null ? map['goalId'] as String : null,
-    );
-  }
-  
   factory Task.fromAppwriteDoc(Document doc) {
     final data = doc.data;
     return Task(
@@ -76,17 +79,16 @@ class Task {
       priority: data['priority'] as String,
       timeframe: data['timeframe'] as String,
       description: data['description'] as String,
+      createdAt: DateTime.parse(data['createdAt']),
+      expectedCompletion: data['expectedCompletion'] != null ? DateTime.parse(data['expectedCompletion']) : null,
       goalId: data['goalId'] as String?,
+      isMarkedForToday: data['isMarkedForToday'] as bool
     );
   }
 
-  String toJson() => json.encode(toMap());
-
-  factory Task.fromJson(String source) => Task.fromMap(json.decode(source) as Map<String, dynamic>);
-
   @override
   String toString() {
-    return 'Task(id: $id, title: $title, type: $type, priority: $priority, timeframe: $timeframe, description: $description, goalId: $goalId)';
+    return 'Task(id: $id, title: $title, type: $type, priority: $priority, timeframe: $timeframe, description: $description, createdAt: $createdAt, expectedCompletion: $expectedCompletion, goalId: $goalId, isMarkedForToday: $isMarkedForToday)';
   }
 
   @override
@@ -100,7 +102,10 @@ class Task {
       other.priority == priority &&
       other.timeframe == timeframe &&
       other.description == description &&
-      other.goalId == goalId;
+      other.createdAt == createdAt &&
+      other.expectedCompletion == expectedCompletion &&
+      other.goalId == goalId &&
+      other.isMarkedForToday == isMarkedForToday;
   }
 
   @override
@@ -111,6 +116,52 @@ class Task {
       priority.hashCode ^
       timeframe.hashCode ^
       description.hashCode ^
-      goalId.hashCode;
+      createdAt.hashCode ^
+      expectedCompletion.hashCode ^
+      goalId.hashCode ^
+      isMarkedForToday.hashCode;
   }
+
+
+  DateTime? get getExpectedDateFromTimeframe {
+    final now = DateTime.now();
+
+    switch (timeframe) {
+      case "None":
+        return null;
+      case "Today":
+        return now.add(const Duration(days: 1));
+      case "3":
+        return now.add(const Duration(days: 3));
+      case "Week":
+        return now.add(const Duration(days: 7));
+      case "Fortnight":
+        return now.add(const Duration(days: 14));
+      case "Month":
+        return now.add(const Duration(days: 30));
+      case "90":
+        return now.add(const Duration(days: 90));
+      case "Year":
+        return now.add(const Duration(days: 365));
+      default:
+        return null;
+    }
+  }
+
+  factory Task.fromMap(Map<String, dynamic> map) {
+    return Task(
+      id: map['id'] as String,
+      title: map['title'] as String,
+      type: map['type'] as String,
+      priority: map['priority'] as String,
+      timeframe: map['timeframe'] as String,
+      description: map['description'] as String,
+      createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt'] as int),
+      expectedCompletion: map['expectedCompletion'] != null ? DateTime.fromMillisecondsSinceEpoch(map['expectedCompletion'] as int) : null,
+      goalId: map['goalId'] != null ? map['goalId'] as String : null,
+      isMarkedForToday: map['isMarkedForToday'] as bool,
+    );
+  }
+
+  factory Task.fromJson(String source) => Task.fromMap(json.decode(source) as Map<String, dynamic>);
 }

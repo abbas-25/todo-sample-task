@@ -9,10 +9,12 @@ import 'package:provider/provider.dart';
 import 'package:todo_sample/src/config/app_theme.dart';
 import 'package:todo_sample/src/providers/edit_goals_provider.dart';
 import 'package:todo_sample/src/providers/edit_tasks_provider.dart';
+import 'package:todo_sample/src/providers/existing_task_provider.dart';
 import 'package:todo_sample/src/providers/goals_list_provider.dart';
 import 'package:todo_sample/src/providers/home_provider.dart';
 import 'package:todo_sample/src/providers/task_details_provider.dart';
 import 'package:todo_sample/src/providers/tasks_list_provider.dart';
+import 'package:todo_sample/src/providers/today_tasks_list_provider.dart';
 import 'package:todo_sample/src/routes/app_router.dart';
 import 'package:todo_sample/src/views/home/home_page.dart';
 
@@ -65,6 +67,12 @@ class _MyAppState extends State<MyApp> {
                 db: db, goalsListProvider: goalsListProvider)),
         ChangeNotifierProvider(
             create: (context) => TaskDetailsProvider(
+                db: db)),
+        ChangeNotifierProvider(
+            create: (context) => TodayTasksListProvider(
+                db: db)),
+        ChangeNotifierProvider(
+            create: (context) => ExistingTasksProvider(
                 db: db)),
       ],
       child: ScreenUtilInit(

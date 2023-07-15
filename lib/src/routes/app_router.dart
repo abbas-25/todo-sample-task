@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:todo_sample/src/models/goal.dart';
 import 'package:todo_sample/src/routes/routes.dart';
+import 'package:todo_sample/src/views/existing_tasks/existing_tasks_page.dart';
 import 'package:todo_sample/src/views/goals_list/goals_list_page.dart';
 import 'package:todo_sample/src/views/home/home_page.dart';
 import 'package:todo_sample/src/views/new_goal/new_goal_page.dart';
 import 'package:todo_sample/src/views/new_task/new_task_page.dart';
 import 'package:todo_sample/src/views/goal_details/goal_details_page.dart';
 import 'package:todo_sample/src/views/task_details/task_details_page.dart';
-import 'package:todo_sample/src/views/tasks_list/tasks_list_page.dart';
+import 'package:todo_sample/src/views/today_tasks_list/today_tasks_list_page.dart';
 
 import '../models/task.dart';
 
@@ -37,8 +38,10 @@ class AppRouter {
         return const GoalsListPage();
       case Routes.goalDetails:
         return GoalDetailPage(goal: settings.arguments as Goal);
-      case Routes.tasksList:
-        return const TasksListPage();
+      case Routes.todayTasksList:
+        return const TodayTaskListPage();
+      case Routes.existingTasks:
+        return const ExistingTasksPage();
 
       default:
         return const HomePage();

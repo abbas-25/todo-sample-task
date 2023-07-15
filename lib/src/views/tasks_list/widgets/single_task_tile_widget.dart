@@ -1,9 +1,11 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:todo_sample/src/config/app_theme.dart';
 import 'package:todo_sample/src/config/typography.dart';
 
 import 'package:todo_sample/src/models/task.dart';
+import 'package:todo_sample/src/providers/today_tasks_list_provider.dart';
 import 'package:todo_sample/src/routes/routes.dart';
 import 'package:todo_sample/src/utils/utils.dart';
 
@@ -18,7 +20,14 @@ class SingleTaskTileWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Navigator.of(context).pushNamed(Routes.taskDetails, arguments: task);
+        Navigator.of(context)
+            .pushNamed(Routes.taskDetails, arguments: task)
+            .then((value) {
+          if (value != null && value.runtimeType == bool && value == true) {
+            Provider.of<TodayTasksListProvider>(context, listen: false)
+                .getTodayTasksFromDb();
+          }
+        });
       },
       child: Container(
         decoration: BoxDecoration(
@@ -28,10 +37,10 @@ class SingleTaskTileWidget extends StatelessWidget {
               width: 1,
             ),
             color: Colors.white,
-            gradient: const LinearGradient(colors: [
-              Color(0xffFFFFFF),
-              Color(0xffEDF3FF),
-            ]),
+            // gradient: const LinearGradient(colors: [
+            //   Color(0xffFFFFFF),
+            //   Color(0xffEDF3FF),
+            // ]),
             boxShadow: [
               BoxShadow(
                 color: const Color(0xff000000).withOpacity(0.05),

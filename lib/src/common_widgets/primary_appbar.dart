@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:todo_sample/src/config/app_theme.dart';
+import 'package:todo_sample/src/config/typography.dart';
 
 class PrimaryAppBar extends StatelessWidget {
   const PrimaryAppBar({
@@ -16,7 +16,7 @@ class PrimaryAppBar extends StatelessWidget {
             onTap: () {
               Navigator.of(context).pop();
             },
-            child: Icon(Icons.arrow_back_ios_new_rounded, color: AppTheme.primaryColor)) : null,
+            child: const Icon(Icons.arrow_back_ios_new_rounded, color: AppTypography.textDefaultColor)) : null,
     );
   }
 }

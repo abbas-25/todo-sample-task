@@ -1,6 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
-import 'package:todo_sample/src/config/app_theme.dart';
 import 'package:todo_sample/src/config/typography.dart';
 
 class PageHeader extends StatelessWidget {
@@ -31,7 +30,7 @@ class PageHeader extends StatelessWidget {
       children: [
         Text(title,
             style:
-                AppTypography.headline3.copyWith(color: AppTheme.primaryColor)),
+                AppTypography.headline3.copyWith()),
         if (subtitle != null)
           Text(
             subtitle,

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:todo_sample/src/config/database_constants.dart';
 
 import 'package:todo_sample/src/models/goal.dart';
+import 'package:todo_sample/src/models/task.dart';
 
 class TaskDetailsProvider with ChangeNotifier {
   final Databases db;
@@ -15,6 +16,51 @@ class TaskDetailsProvider with ChangeNotifier {
 
   ValueNotifier<Goal?> goal = ValueNotifier(null);
   ValueNotifier<bool> isLoadingGoal = ValueNotifier(true);
+  ValueNotifier<bool> isMarkingTaskForToday = ValueNotifier(false);
+
+  Future<bool> markTaskForToday(Task task) async {
+    try {
+      isMarkingTaskForToday.value = true;
+
+      await db.updateDocument(
+        databaseId: primaryDatabaseId,
+        collectionId: tasksCollectionId,
+        documentId: task.id,
+        data: task
+            .copyWith(
+              isMarkedForToday: true,
+            )
+            .toMap(),
+      );
+      return true;
+    } catch (exception) {
+      return false;
+    } finally {
+      isMarkingTaskForToday.value = false;
+    }
+  }
+
+   Future<bool> removeTaskForToday(Task task) async {
+    try {
+      isMarkingTaskForToday.value = true;
+
+      await db.updateDocument(
+        databaseId: primaryDatabaseId,
+        collectionId: tasksCollectionId,
+        documentId: task.id,
+        data: task
+            .copyWith(
+              isMarkedForToday: false,
+            )
+            .toMap(),
+      );
+      return true;
+    } catch (exception) {
+      return false;
+    } finally {
+      isMarkingTaskForToday.value = false;
+    }
+  }
 
   Future<Goal?> fetchGoal(String goalId) async {
     try {
