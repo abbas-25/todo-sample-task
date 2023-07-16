@@ -87,7 +87,7 @@ class _ExistingTasksPageState extends State<ExistingTasksPage> {
                   builder: (context, _, __) {
                     if (prov.isLoadingTasks.value) {
                       return const Center(child: CircularProgressIndicator());
-                    } else if (prov.visibleTasks.value.isEmpty) {
+                    } else if (prov.visibleTasks.isEmpty) {
                       return Column(
                         children: [
                           const SizedBox(
@@ -102,19 +102,21 @@ class _ExistingTasksPageState extends State<ExistingTasksPage> {
                     }
 
                     return ListView.builder(
-                        itemCount: prov.visibleTasks.value.length,
+                        itemCount: prov.visibleTasks.length,
                         itemBuilder: (context, index) {
                           return Column(
                             children: [
                               SingleExistingTaskTile(
-                                  task: prov.visibleTasks.value[index]),
+                                  task: prov.visibleTasks[index]),
                               const SizedBox(height: 16),
                             ],
                           );
                         });
                   }),
             ),
+            const SizedBox(height: 150,)
           ],
+          
         ),
       ),
       bottomSheet: Padding(

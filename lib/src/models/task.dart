@@ -126,22 +126,22 @@ class Task {
   DateTime? get getExpectedDateFromTimeframe {
     final now = DateTime.now();
 
-    switch (timeframe) {
-      case "None":
+    switch (timeframe.toLowerCase()) {
+      case "none":
         return null;
-      case "Today":
+      case "today":
         return now.add(const Duration(days: 1));
-      case "3":
+      case "3 days":
         return now.add(const Duration(days: 3));
-      case "Week":
+      case "week":
         return now.add(const Duration(days: 7));
-      case "Fortnight":
+      case "fortnight":
         return now.add(const Duration(days: 14));
-      case "Month":
+      case "month":
         return now.add(const Duration(days: 30));
-      case "90":
+      case "90 days":
         return now.add(const Duration(days: 90));
-      case "Year":
+      case "year":
         return now.add(const Duration(days: 365));
       default:
         return null;

@@ -138,7 +138,11 @@ class _NewTaskPageState extends State<NewTaskPage> {
                                     var task = Task(
                                       id: "", // not used in creation
                                       createdAt: DateTime.now(),
-                                      isMarkedForToday: false,
+                                      isMarkedForToday: timeframe!
+                                              .toLowerCase()
+                                              .contains("today")
+                                          ? true
+                                          : false,
                                       goalId: provider.chosenGoal?.id,
                                       expectedCompletion: null,
                                       title: titleController.text.trim(),
@@ -153,7 +157,8 @@ class _NewTaskPageState extends State<NewTaskPage> {
                                             task.getExpectedDateFromTimeframe);
 
                                     prov.createTaskFromDb(task: task).then(
-                                        (value) => Navigator.of(context).pop(true));
+                                        (value) =>
+                                            Navigator.of(context).pop(true));
                                   },
                                 ),
                                 const SizedBox(height: 100)

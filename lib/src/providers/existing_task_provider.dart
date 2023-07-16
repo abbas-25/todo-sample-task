@@ -14,8 +14,8 @@ class ExistingTasksProvider with ChangeNotifier {
     required this.db,
   });
 
-  List<Task> tasks = [];
-  ValueNotifier<List<Task>> visibleTasks = ValueNotifier([]);
+  List<Task> _tasks = [];
+  List<Task> visibleTasks = [];
 
   ValueNotifier<bool> isLoadingTasks = ValueNotifier(true);
   ValueNotifier<bool> isMarkingTaskForToday = ValueNotifier(false);
@@ -27,8 +27,8 @@ class ExistingTasksProvider with ChangeNotifier {
 
   init() {
     selected.value = null;
-    tasks = [];
-    visibleTasks.value = [];
+    _tasks = [];
+    visibleTasks = [];
     isMarkingTaskForToday.value = false;
     selectedFilter.value = "All";
     final tfs = timeframes.sublist(2);
@@ -49,8 +49,10 @@ class ExistingTasksProvider with ChangeNotifier {
         models.add(Task.fromAppwriteDoc(t));
       }
 
-      visibleTasks.value = models;
-      return tasks = models;
+      _tasks = models;
+      visibleTasks = [];
+      filterTasksByTimeframe(selectedFilter.value, true);
+      return _tasks;
     } catch (exception) {
       log("Error Logged in Appwrite call  - $exception");
       return [];
@@ -85,51 +87,69 @@ class ExistingTasksProvider with ChangeNotifier {
     }
   }
 
-  void filterTasksByTimeframe(String tf) {
-    log("Filter $tf");
-    if (tf == selectedFilter.value) return;
+  void filterTasksByTimeframe(String tf, [bool overrideReturn = false]) {
+    log("Filterrr $tf");
+    if (!overrideReturn) {
+      if (tf == selectedFilter.value) return;
+    }
+    selected.value = null;
     selectedFilter.value = tf;
-    visibleTasks.value.clear();
+    visibleTasks = [];
 
     if (tf == "All") {
-      visibleTasks.value = tasks;
+      visibleTasks = [..._tasks];
+      log("visibleTasksss $_tasks");
     } else {
       final now = DateTime.now();
-      final dr = getDurationFromExpectedTime(tf);
-      for (Task element in tasks) {
-        if (dr != null) {
-          if ((element.expectedCompletion?.isBefore(now.add(dr)) ?? false)) {
-            visibleTasks.value.add(element);
-          }
+      List<Task> tempTasks = [];
+      final dr = getDurationFromFilterName(tf);
+      log("Filtering dr --> $tf");
+      for (Task element in _tasks) {
+        if (element.expectedCompletion == null) continue;
+        
+        var exp = element.expectedCompletion!.subtract(Duration(days: 1));
+        // exp = exp.copyWith(
+        //   hour: 23,
+        //   minute: 59,
+        // );
+
+        if (tf == "3 days") {
+          log("Filtering condition --> $dr");
+          log("Filtering condition --> ${(element.expectedCompletion!).toString()}");
+        }
+        if (!now.add(Duration(days: dr)).isBefore(exp)) {
+          tempTasks.add(element);
         }
       }
+      visibleTasks = [...tempTasks];
     }
     isLoadingTasks.value = true;
-    Future.delayed(const Duration(milliseconds: 200), () {
+    Future.delayed(const Duration(milliseconds: 300), () {
       isLoadingTasks.value = false;
     });
   }
 }
 
-Duration? getDurationFromExpectedTime(String tf) {
-  switch (tf) {
-    case "None":
-      return null;
-    case "Today":
-      return const Duration(days: 1);
-    case "3":
-      return const Duration(days: 3);
-    case "Week":
-      return const Duration(days: 7);
-    case "Fortnight":
-      return const Duration(days: 14);
-    case "Month":
-      return const Duration(days: 30);
-    case "90":
-      return const Duration(days: 90);
-    case "Year":
-      return const Duration(days: 365);
+int getDurationFromFilterName(String tf) {
+  switch (tf.toLowerCase()) {
+    /// [not required conditions]
+    // case "None":
+    //   return null;
+    // case "Today":
+    //   return const Duration(days: 1);
+    case "3 days":
+      return 3;
+    case "week":
+      return 7;
+    case "fortnight":
+      return 14;
+    case "month":
+      return 30;
+    case "90 days":
+      return 90;
+    case "year":
+      return 365;
     default:
-      return null;
+      return 0;
   }
 }
