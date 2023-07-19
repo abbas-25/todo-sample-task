@@ -5,19 +5,35 @@ import 'package:provider/provider.dart';
 
 import 'package:todo_sample/src/common_widgets/page_header.dart';
 import 'package:todo_sample/src/common_widgets/primary_appbar.dart';
+import 'package:todo_sample/src/common_widgets/primary_button.dart';
 import 'package:todo_sample/src/config/app_theme.dart';
+import 'package:todo_sample/src/config/typography.dart';
 import 'package:todo_sample/src/models/goal.dart';
 import 'package:todo_sample/src/providers/edit_goals_provider.dart';
 import 'package:todo_sample/src/providers/edit_tasks_provider.dart';
+import 'package:todo_sample/src/providers/goal_details_provider.dart';
 import 'package:todo_sample/src/views/task_details/widgets/single_task_preview_detail_widget.dart';
+import 'package:todo_sample/src/views/tasks_list/widgets/single_task_tile_widget.dart';
 
-
-class GoalDetailPage extends StatelessWidget {
+class GoalDetailPage extends StatefulWidget {
   final Goal goal;
   const GoalDetailPage({
     Key? key,
     required this.goal,
   }) : super(key: key);
+
+  @override
+  State<GoalDetailPage> createState() => _GoalDetailPageState();
+}
+
+class _GoalDetailPageState extends State<GoalDetailPage> {
+  late GoalDetailsProvider prov;
+
+  @override
+  void initState() {
+    super.initState();
+    prov = Provider.of<GoalDetailsProvider>(context, listen: false);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,17 +58,17 @@ class GoalDetailPage extends StatelessWidget {
                             const SizedBox(height: 32),
                             SingleTaskPreviewDetailWidget(
                               title: "Goal",
-                              value: goal.title,
+                              value: widget.goal.title,
                               showDivider: true,
                             ),
                             SingleTaskPreviewDetailWidget(
                               title: "Type",
-                              value: goal.type,
+                              value: widget.goal.type,
                               showDivider: true,
                             ),
                             SingleTaskPreviewDetailWidget(
                               title: "Description",
-                              value: goal.description,
+                              value: widget.goal.description,
                               showDivider: false,
                             ),
                             const SizedBox(height: 50)
@@ -69,7 +85,77 @@ class GoalDetailPage extends StatelessWidget {
           );
         },
       ),
+      bottomSheet: _buildTasksByGoalsButton(),
     );
+  }
+
+  Container _buildTasksByGoalsButton() {
+    return Container(
+        padding: const EdgeInsets.all(20),
+        child: PrimaryOutlineButton(
+            title: "View Tasks",
+            onTap: () {
+              prov.getTasksFromDb(widget.goal.id);
+              showModalBottomSheet(
+                  isScrollControlled: true,
+                  constraints: BoxConstraints(
+                    minHeight: MediaQuery.of(context).size.height * 0.75,
+                    maxHeight: MediaQuery.of(context).size.height * 0.75,
+                  ),
+                  backgroundColor: Theme.of(context).canvasColor,
+                  shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(12),
+                    topRight: Radius.circular(12),
+                  )),
+                  context: context,
+                  builder: (ctx) {
+                    return ValueListenableBuilder(
+                        valueListenable: prov.loadingTasks,
+                        builder: (context, _, __) {
+                          if (prov.loadingTasks.value) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          } else {
+                            return SingleChildScrollView(
+                                child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 30),
+                              child: Column(
+                                children: [
+                                  Align(
+                                    alignment: Alignment.topLeft,
+                                    child: Text(
+                                      "Tasks",
+                                      style: AppTypography.headline1.copyWith(
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 16,
+                                  ),
+                                  if (prov.tasksByGoals.isEmpty)
+                                    const Padding(
+                                      padding: EdgeInsets.only(top: 50),
+                                      child: Text(
+                                        "No Tasks to show!",
+                                        style: AppTypography.caption,
+                                      ),
+                                    ),
+                                  for (final item in prov.tasksByGoals)
+                                    Padding(
+                                        padding:
+                                            const EdgeInsets.only(bottom: 16),
+                                        child:
+                                            SingleTaskTileWidget(task: item)),
+                                ],
+                              ),
+                            ));
+                          }
+                        });
+                  });
+            }));
   }
 
   PreferredSize _buildAppBar() {
@@ -83,7 +169,8 @@ class GoalDetailPage extends StatelessWidget {
       trailingIcon: InkWell(
         onTap: () {
           Provider.of<EditGoalsProvider>(context, listen: false)
-              .deleteDocument(goal).then((value) => Navigator.of(context).pop());
+              .deleteDocument(widget.goal)
+              .then((value) => Navigator.of(context).pop());
         },
         child: Container(
           height: 48,

@@ -33,7 +33,7 @@ class PrimaryButton extends StatelessWidget {
               ),
               onPressed: () {
                 log("Button tapped");
-                if (isDisabled) return;
+                if (isDisabled || isLoading) return;
                 if (onTap != null) {
                   onTap!();
                 }
@@ -47,5 +47,55 @@ class PrimaryButton extends StatelessWidget {
                       style: AppTypography.button.copyWith(),
                     ))),
     );
+  }
+}
+
+class PrimaryOutlineButton extends StatelessWidget {
+  final String title;
+  final Function? onTap;
+  final bool isLoading;
+  final bool isDisabled;
+  const PrimaryOutlineButton({
+    Key? key,
+    required this.title,
+    this.isLoading = false,
+    this.isDisabled = false,
+    this.onTap,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+        // margin: const EdgeInsets.all(12),
+        height: 56,
+        width: double.infinity,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(6),
+          child: OutlinedButton(
+              style: ButtonStyle(
+                side: MaterialStateProperty.resolveWith<BorderSide>(
+                    (Set<MaterialState> states) {
+                  return BorderSide(
+                    color: isDisabled ? Colors.grey : AppTheme.primaryColor,
+                    width: 2,
+                  );
+                }),
+              ),
+              onPressed: () {
+                if (isDisabled || isLoading) return;
+                if (onTap != null) {
+                  onTap!();
+                }
+              },
+              child: isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(color: Colors.white),
+                    )
+                  : Text(
+                      title,
+                      style: AppTypography.button
+                          .copyWith(color: AppTheme.primaryColor),
+                    )),
+        ));
   }
 }
