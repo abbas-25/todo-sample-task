@@ -107,16 +107,8 @@ class ExistingTasksProvider with ChangeNotifier {
       for (Task element in _tasks) {
         if (element.expectedCompletion == null) continue;
         
-        var exp = element.expectedCompletion!.subtract(Duration(days: 1));
-        // exp = exp.copyWith(
-        //   hour: 23,
-        //   minute: 59,
-        // );
+        var exp = element.expectedCompletion!.subtract(const Duration(days: 1));
 
-        if (tf == "3 days") {
-          log("Filtering condition --> $dr");
-          log("Filtering condition --> ${(element.expectedCompletion!).toString()}");
-        }
         if (!now.add(Duration(days: dr)).isBefore(exp)) {
           tempTasks.add(element);
         }
