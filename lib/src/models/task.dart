@@ -14,6 +14,7 @@ class Task {
   final DateTime? expectedCompletion;
   final String? goalId;
   final bool isMarkedForToday;
+  final bool? isCompleted;
   Task({
     required this.id,
     required this.title,
@@ -25,6 +26,7 @@ class Task {
     required this.expectedCompletion,
     this.goalId,
     required this.isMarkedForToday,
+    this.isCompleted,
   });
 
   String get getTaskPriorityString => priority.replaceAll("_", " ");
@@ -67,23 +69,27 @@ class Task {
       'expectedCompletion': expectedCompletion?.toString(),
       'goalId': goalId,
       'isMarkedForToday': isMarkedForToday,
+      'isCompleted': false,
     };
   }
 
   factory Task.fromAppwriteDoc(Document doc) {
     final data = doc.data;
     return Task(
-      id: doc.$id,
-      title: data['title'] as String,
-      type: data['type'] as String,
-      priority: data['priority'] as String,
-      timeframe: data['timeframe'] as String,
-      description: data['description'] as String,
-      createdAt: DateTime.parse(data['createdAt']),
-      expectedCompletion: data['expectedCompletion'] != null ? DateTime.parse(data['expectedCompletion']) : null,
-      goalId: data['goalId'] as String?,
-      isMarkedForToday: data['isMarkedForToday'] as bool
-    );
+        id: doc.$id,
+        title: data['title'] as String,
+        type: data['type'] as String,
+        priority: data['priority'] as String,
+        timeframe: data['timeframe'] as String,
+        description: data['description'] as String,
+        createdAt: DateTime.parse(data['createdAt']),
+        expectedCompletion: data['expectedCompletion'] != null
+            ? DateTime.parse(data['expectedCompletion'])
+            : null,
+        goalId: data['goalId'] as String?,
+        isMarkedForToday: data['isMarkedForToday'] as bool,
+        isCompleted:
+            data['isCompleted'] == null ? null : data['isCompleted'] as bool);
   }
 
   @override
@@ -94,34 +100,32 @@ class Task {
   @override
   bool operator ==(covariant Task other) {
     if (identical(this, other)) return true;
-  
-    return 
-      other.id == id &&
-      other.title == title &&
-      other.type == type &&
-      other.priority == priority &&
-      other.timeframe == timeframe &&
-      other.description == description &&
-      other.createdAt == createdAt &&
-      other.expectedCompletion == expectedCompletion &&
-      other.goalId == goalId &&
-      other.isMarkedForToday == isMarkedForToday;
+
+    return other.id == id &&
+        other.title == title &&
+        other.type == type &&
+        other.priority == priority &&
+        other.timeframe == timeframe &&
+        other.description == description &&
+        other.createdAt == createdAt &&
+        other.expectedCompletion == expectedCompletion &&
+        other.goalId == goalId &&
+        other.isMarkedForToday == isMarkedForToday;
   }
 
   @override
   int get hashCode {
     return id.hashCode ^
-      title.hashCode ^
-      type.hashCode ^
-      priority.hashCode ^
-      timeframe.hashCode ^
-      description.hashCode ^
-      createdAt.hashCode ^
-      expectedCompletion.hashCode ^
-      goalId.hashCode ^
-      isMarkedForToday.hashCode;
+        title.hashCode ^
+        type.hashCode ^
+        priority.hashCode ^
+        timeframe.hashCode ^
+        description.hashCode ^
+        createdAt.hashCode ^
+        expectedCompletion.hashCode ^
+        goalId.hashCode ^
+        isMarkedForToday.hashCode;
   }
-
 
   DateTime? get getExpectedDateFromTimeframe {
     final now = DateTime.now();
@@ -157,11 +161,15 @@ class Task {
       timeframe: map['timeframe'] as String,
       description: map['description'] as String,
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt'] as int),
-      expectedCompletion: map['expectedCompletion'] != null ? DateTime.fromMillisecondsSinceEpoch(map['expectedCompletion'] as int) : null,
+      expectedCompletion: map['expectedCompletion'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(
+              map['expectedCompletion'] as int)
+          : null,
       goalId: map['goalId'] != null ? map['goalId'] as String : null,
       isMarkedForToday: map['isMarkedForToday'] as bool,
     );
   }
 
-  factory Task.fromJson(String source) => Task.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory Task.fromJson(String source) =>
+      Task.fromMap(json.decode(source) as Map<String, dynamic>);
 }
