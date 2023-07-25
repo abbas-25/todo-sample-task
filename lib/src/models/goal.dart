@@ -8,11 +8,13 @@ class Goal {
   final String title;
   final String type;
   final String description;  
+  final bool isCompleted;
   Goal({
     required this.id,
     required this.title,
     required this.type,
     required this.description,
+    required this.isCompleted,
   });
 
 
@@ -21,12 +23,14 @@ class Goal {
     String? title,
     String? type,
     String? description,
+    bool? isCompleted,
   }) {
     return Goal(
       id: id ?? this.id,
       title: title ?? this.title,
       type: type ?? this.type,
       description: description ?? this.description,
+      isCompleted: isCompleted ?? this.isCompleted,
     );
   }
 
@@ -35,6 +39,7 @@ class Goal {
       'title': title,
       'type': type,
       'description': description,
+      'isCompleted': isCompleted,
     };
   }
 
@@ -44,6 +49,7 @@ class Goal {
       title: map['title'] as String,
       type: map['type'] as String,
       description: map['description'] as String,
+      isCompleted: map['isCompleted'] as bool,
     );
   }
   
@@ -51,6 +57,7 @@ class Goal {
     final data = doc.data;
     return Goal(
       id: doc.$id,
+      isCompleted: (data['isCompleted'] ?? false) as bool,
       title: data['title'] as String,
       type: data['type'] as String,
       description: data['description'] as String,
@@ -63,7 +70,7 @@ class Goal {
 
   @override
   String toString() {
-    return title;
+    return 'Goal(id: $id, title: $title, type: $type, description: $description, isCompleted: $isCompleted)';
   }
 
   @override
@@ -74,7 +81,8 @@ class Goal {
       other.id == id &&
       other.title == title &&
       other.type == type &&
-      other.description == description;
+      other.description == description &&
+      other.isCompleted == isCompleted;
   }
 
   @override
@@ -82,6 +90,7 @@ class Goal {
     return id.hashCode ^
       title.hashCode ^
       type.hashCode ^
-      description.hashCode;
+      description.hashCode ^
+      isCompleted.hashCode;
   }
 }

@@ -9,8 +9,6 @@ import 'package:todo_sample/src/common_widgets/primary_button.dart';
 import 'package:todo_sample/src/config/app_theme.dart';
 import 'package:todo_sample/src/config/typography.dart';
 import 'package:todo_sample/src/models/goal.dart';
-import 'package:todo_sample/src/providers/edit_goals_provider.dart';
-import 'package:todo_sample/src/providers/edit_tasks_provider.dart';
 import 'package:todo_sample/src/providers/goal_details_provider.dart';
 import 'package:todo_sample/src/views/task_details/widgets/single_task_preview_detail_widget.dart';
 import 'package:todo_sample/src/views/tasks_list/widgets/single_task_tile_widget.dart';
@@ -27,65 +25,110 @@ class GoalDetailPage extends StatefulWidget {
 }
 
 class _GoalDetailPageState extends State<GoalDetailPage> {
-  late GoalDetailsProvider prov;
+  late GoalDetailsProvider detailsProv;
 
   @override
   void initState() {
     super.initState();
-    prov = Provider.of<GoalDetailsProvider>(context, listen: false);
+    detailsProv = Provider.of<GoalDetailsProvider>(context, listen: false);
+    detailsProv.init(widget.goal);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _buildAppBar(),
-      body: Consumer<EditTaskProvider>(
-        builder: (context, prov, __) {
-          return Stack(
-            children: [
-              Positioned.fill(
-                child: IgnorePointer(
-                  ignoring: prov.isProcessing,
-                  child: Opacity(
-                    opacity: prov.isProcessing ? 0.5 : 1,
-                    child: SingleChildScrollView(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildPageHeader(context),
-                            const SizedBox(height: 32),
-                            SingleTaskPreviewDetailWidget(
-                              title: "Goal",
-                              value: widget.goal.title,
-                              showDivider: true,
+      body: ValueListenableBuilder(
+        valueListenable: detailsProv.loadingGoal,
+        builder: (context, _, __) {
+          if(detailsProv.loadingGoal.value) {
+            return const Center(child: CircularProgressIndicator(),);
+          }
+          return  ValueListenableBuilder(
+              valueListenable: detailsProv.processing,
+              builder: (context, _, __) {
+                return Stack(
+                  children: [
+                    Positioned.fill(
+                      child: IgnorePointer(
+                        ignoring: detailsProv.processing.value,
+                        child: Opacity(
+                          opacity: detailsProv.processing.value ? 0.5 : 1,
+                          child: SingleChildScrollView(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  _buildPageHeader(context),
+                                  const SizedBox(height: 24),
+                                  _buildOptions(),
+                                  const SizedBox(height: 24),
+                                  SingleTaskPreviewDetailWidget(
+                                    title: "Goal",
+                                    value: widget.goal.title,
+                                    showDivider: true,
+                                  ),
+                                  SingleTaskPreviewDetailWidget(
+                                    title: "Type",
+                                    value: widget.goal.type,
+                                    showDivider: true,
+                                  ),
+                                  SingleTaskPreviewDetailWidget(
+                                    title: "Description",
+                                    value: widget.goal.description,
+                                    showDivider: false,
+                                  ),
+                                  const SizedBox(height: 50)
+                                ],
+                              ),
                             ),
-                            SingleTaskPreviewDetailWidget(
-                              title: "Type",
-                              value: widget.goal.type,
-                              showDivider: true,
-                            ),
-                            SingleTaskPreviewDetailWidget(
-                              title: "Description",
-                              value: widget.goal.description,
-                              showDivider: false,
-                            ),
-                            const SizedBox(height: 50)
-                          ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ),
-              ),
-              if (prov.isProcessing)
-                const Center(child: CircularProgressIndicator()),
-            ],
-          );
-        },
+                    if (detailsProv.processing.value)
+                      const Center(child: CircularProgressIndicator()),
+                  ],
+                );
+              });
+        }
       ),
       bottomSheet: _buildTasksByGoalsButton(),
+    );
+  }
+
+  Widget _buildOptions() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        ValueListenableBuilder(
+          valueListenable: detailsProv.isCompleted,
+          builder: (c, _, __) => DetailsPageOption(
+            icon: "assets/icons/complete-tick.svg",
+            state: detailsProv.isCompleted.value,
+            title: "Complete",
+            onTap: () {
+              if (detailsProv.isCompleted.value) {
+                return;
+              } else {
+                detailsProv.markGoalAsComplete(goal: widget.goal);
+              }
+            },
+          ),
+        ),
+        const SizedBox(
+          width: 40,
+        ),
+        DetailsPageOption(
+          icon: "assets/icons/clock.svg",
+          state: true,
+          title: "Add Time",
+          onTap: () {
+            // todo show add time poppup
+          },
+        ),
+      ],
     );
   }
 
@@ -95,7 +138,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
         child: PrimaryOutlineButton(
             title: "View Tasks",
             onTap: () {
-              prov.getTasksFromDb(widget.goal.id);
+              detailsProv.getTasksFromDb(widget.goal.id);
               showModalBottomSheet(
                   isScrollControlled: true,
                   constraints: BoxConstraints(
@@ -111,9 +154,9 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                   context: context,
                   builder: (ctx) {
                     return ValueListenableBuilder(
-                        valueListenable: prov.loadingTasks,
+                        valueListenable: detailsProv.loadingTasks,
                         builder: (context, _, __) {
-                          if (prov.loadingTasks.value) {
+                          if (detailsProv.loadingTasks.value) {
                             return const Center(
                               child: CircularProgressIndicator(),
                             );
@@ -135,7 +178,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                                   const SizedBox(
                                     height: 16,
                                   ),
-                                  if (prov.tasksByGoals.isEmpty)
+                                  if (detailsProv.tasksByGoals.isEmpty)
                                     const Padding(
                                       padding: EdgeInsets.only(top: 50),
                                       child: Text(
@@ -143,7 +186,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                                         style: AppTypography.caption,
                                       ),
                                     ),
-                                  for (final item in prov.tasksByGoals)
+                                  for (final item in detailsProv.tasksByGoals)
                                     Padding(
                                         padding:
                                             const EdgeInsets.only(bottom: 16),
@@ -164,27 +207,61 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
   }
 
   PageHeader _buildPageHeader(BuildContext context) {
-    return PageHeader(
+    return const PageHeader(
       title: "Goal Details",
-      trailingIcon: InkWell(
-        onTap: () {
-          Provider.of<EditGoalsProvider>(context, listen: false)
-              .deleteDocument(widget.goal)
-              .then((value) => Navigator.of(context).pop());
-        },
-        child: Container(
-          height: 48,
-          width: 48,
-          decoration: const BoxDecoration(
-            color: Color(0xffEDF3FF),
-            shape: BoxShape.circle,
-          ),
+      // trailingIcon: InkWell(
+      //   onTap: () {
+      //     Provider.of<EditGoalsProvider>(context, listen: false)
+      //         .deleteDocument(widget.goal)
+      //         .then((value) => Navigator.of(context).pop());
+      //   },
+      // ),
+    );
+  }
+}
+
+class DetailsPageOption extends StatelessWidget {
+  final Function onTap;
+  final String icon;
+  final bool state;
+  final String title;
+  const DetailsPageOption({
+    Key? key,
+    required this.onTap,
+    required this.icon,
+    required this.state,
+    required this.title,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        InkWell(
+          onTap: () => onTap(),
+          // child: Container(
+          //   height: 48,
+          //   width: 48,
+          //   decoration: BoxDecoration(
+          //     color: state ? const Color(0xffEDF3FF) : Colors.transparent,
+          //     shape: BoxShape.circle,
+          //   ),
           child: Center(
-            child: SvgPicture.asset("assets/icons/dustbin.svg",
-                height: 23.33, width: 21, color: AppTheme.primaryColor),
+            child: SvgPicture.asset(
+              icon,
+              color: state ? AppTheme.primaryColor : Colors.grey,
+            ),
+            // ),
           ),
         ),
-      ),
+        const SizedBox(
+          height: 6,
+        ),
+        Text(
+          title,
+          style: AppTypography.subtitle2.copyWith(color: AppTheme.primaryColor),
+        )
+      ],
     );
   }
 }

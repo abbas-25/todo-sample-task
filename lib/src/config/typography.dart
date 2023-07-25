@@ -28,6 +28,14 @@ class AppTypography {
     height: 1.5,
   );
 
+  static const subtitle2 = TextStyle(
+    color: textDefaultColor,
+    fontFamily: poppinsFont,
+    fontWeight: FontWeight.w500,
+    fontSize: 16.0,
+    height: 1.5,
+  );
+
   static const caption = TextStyle(
     color: textDefaultColor,
     fontFamily: poppinsFont,

@@ -84,6 +84,7 @@ class _NewGoalPageState extends State<NewGoalPage> {
                                     .createGoalFromDb(
                                         goal: Goal(
                                       id: "",
+                                      isCompleted: false,
                                       title: titleController.text.trim(),
                                       type: type!,
                                       description: descController.text.trim(),
