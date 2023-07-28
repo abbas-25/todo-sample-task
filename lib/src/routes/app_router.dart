@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:todo_sample/src/models/goal.dart';
 import 'package:todo_sample/src/routes/routes.dart';
 import 'package:todo_sample/src/views/existing_tasks/existing_tasks_page.dart';
 import 'package:todo_sample/src/views/goals_list/goals_list_page.dart';
@@ -37,7 +36,7 @@ class AppRouter {
       case Routes.goalsList:
         return const GoalsListPage();
       case Routes.goalDetails:
-        return GoalDetailPage(goal: settings.arguments as Goal);
+        return GoalDetailPage(goalId: settings.arguments as String);
       case Routes.todayTasksList:
         return const TodayTaskListPage();
       case Routes.existingTasks:

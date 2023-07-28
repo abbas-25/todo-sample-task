@@ -18,7 +18,7 @@ class SingleGoalTileWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Navigator.of(context).pushNamed(Routes.goalDetails, arguments: goal);
+        Navigator.of(context).pushNamed(Routes.goalDetails, arguments: goal.id);
       },
       child: Container(
         decoration: BoxDecoration(

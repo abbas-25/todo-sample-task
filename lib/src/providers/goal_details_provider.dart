@@ -17,35 +17,39 @@ class GoalDetailsProvider with ChangeNotifier {
   ValueNotifier<bool> loadingTasks = ValueNotifier(false);
   ValueNotifier<bool> processing = ValueNotifier(false);
   ValueNotifier<bool> isCompleted = ValueNotifier(false);
-  ValueNotifier<bool> loadingGoal = ValueNotifier(false);
+  ValueNotifier<bool> loadingGoal = ValueNotifier(true);
   Goal? goal;
 
-  init(Goal g) async {
-    fetchGoal(g.id);
-    // isCompleted.value = g.isCompleted;
-    processing.value = false;
-    loadingTasks.value = false;
-    loadingGoal.value = false;
+  init(String goalId) async {
+    fetchGoal(goalId);
   }
 
-  Future<void> markGoalAsComplete({required Goal goal}) async {
+  reset() {
+    loadingTasks.value = false;
+    processing.value = false;
+    isCompleted.value = false;
+    loadingGoal.value = false;
+    goal = null;
+    tasksByGoals.clear();
+  }
+
+  Future<void> toggleGoalComplete() async {
     try {
+      if (goal == null) return;
       processing.value = true;
 
       await db.updateDocument(
         databaseId: primaryDatabaseId,
         collectionId: goalsCollectionId,
-        documentId: goal.id,
-        data: goal
+        documentId: goal!.id,
+        data: goal!
             .copyWith(
-              isCompleted: true,
+              isCompleted: isCompleted.value ? false : true,
             )
             .toMap(),
       );
 
-      await fetchGoal(goal.id);
-
-      isCompleted.value = true;
+      await fetchGoal(goal!.id);
     } catch (exception) {
       // todo show toast
       // rethrow;

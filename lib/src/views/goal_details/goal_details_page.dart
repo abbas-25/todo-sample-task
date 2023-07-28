@@ -8,16 +8,15 @@ import 'package:todo_sample/src/common_widgets/primary_appbar.dart';
 import 'package:todo_sample/src/common_widgets/primary_button.dart';
 import 'package:todo_sample/src/config/app_theme.dart';
 import 'package:todo_sample/src/config/typography.dart';
-import 'package:todo_sample/src/models/goal.dart';
 import 'package:todo_sample/src/providers/goal_details_provider.dart';
 import 'package:todo_sample/src/views/task_details/widgets/single_task_preview_detail_widget.dart';
 import 'package:todo_sample/src/views/tasks_list/widgets/single_task_tile_widget.dart';
 
 class GoalDetailPage extends StatefulWidget {
-  final Goal goal;
+  final String goalId;
   const GoalDetailPage({
     Key? key,
-    required this.goal,
+    required this.goalId,
   }) : super(key: key);
 
   @override
@@ -31,7 +30,13 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
   void initState() {
     super.initState();
     detailsProv = Provider.of<GoalDetailsProvider>(context, listen: false);
-    detailsProv.init(widget.goal);
+    detailsProv.init(widget.goalId);
+  }
+
+  @override
+  void dispose() {
+    detailsProv.reset();
+    super.dispose();
   }
 
   @override
@@ -47,6 +52,9 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
           return  ValueListenableBuilder(
               valueListenable: detailsProv.processing,
               builder: (context, _, __) {
+
+                if(detailsProv.goal == null) return const Center(child: Text("Something went wrong!"),);
+
                 return Stack(
                   children: [
                     Positioned.fill(
@@ -66,17 +74,17 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                                   const SizedBox(height: 24),
                                   SingleTaskPreviewDetailWidget(
                                     title: "Goal",
-                                    value: widget.goal.title,
+                                    value: detailsProv.goal!.title,
                                     showDivider: true,
                                   ),
                                   SingleTaskPreviewDetailWidget(
                                     title: "Type",
-                                    value: widget.goal.type,
+                                    value: detailsProv.goal!.type,
                                     showDivider: true,
                                   ),
                                   SingleTaskPreviewDetailWidget(
                                     title: "Description",
-                                    value: widget.goal.description,
+                                    value: detailsProv.goal!.description,
                                     showDivider: false,
                                   ),
                                   const SizedBox(height: 50)
@@ -109,11 +117,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
             state: detailsProv.isCompleted.value,
             title: "Complete",
             onTap: () {
-              if (detailsProv.isCompleted.value) {
-                return;
-              } else {
-                detailsProv.markGoalAsComplete(goal: widget.goal);
-              }
+                detailsProv.toggleGoalComplete();
             },
           ),
         ),
@@ -138,7 +142,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
         child: PrimaryOutlineButton(
             title: "View Tasks",
             onTap: () {
-              detailsProv.getTasksFromDb(widget.goal.id);
+              detailsProv.getTasksFromDb(detailsProv.goal!.id);
               showModalBottomSheet(
                   isScrollControlled: true,
                   constraints: BoxConstraints(
@@ -212,7 +216,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
       // trailingIcon: InkWell(
       //   onTap: () {
       //     Provider.of<EditGoalsProvider>(context, listen: false)
-      //         .deleteDocument(widget.goal)
+      //         .deleteDocument(detailsProv.goal)
       //         .then((value) => Navigator.of(context).pop());
       //   },
       // ),
