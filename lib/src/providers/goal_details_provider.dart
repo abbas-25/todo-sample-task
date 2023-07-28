@@ -49,6 +49,8 @@ class GoalDetailsProvider with ChangeNotifier {
             .toMap(),
       );
 
+      // todo complete all tasks for goal ?
+
       await fetchGoal(goal!.id);
     } catch (exception) {
       // todo show toast

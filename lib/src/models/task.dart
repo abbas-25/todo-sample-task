@@ -43,6 +43,7 @@ class Task {
     DateTime? expectedCompletion,
     String? goalId,
     bool? isMarkedForToday,
+    bool? isCompleted,
   }) {
     return Task(
       id: id ?? this.id,
@@ -55,6 +56,7 @@ class Task {
       expectedCompletion: expectedCompletion ?? this.expectedCompletion,
       goalId: goalId ?? this.goalId,
       isMarkedForToday: isMarkedForToday ?? this.isMarkedForToday,
+      isCompleted: isCompleted ?? this.isCompleted,
     );
   }
 
@@ -69,7 +71,7 @@ class Task {
       'expectedCompletion': expectedCompletion?.toString(),
       'goalId': goalId,
       'isMarkedForToday': isMarkedForToday,
-      'isCompleted': false,
+      'isCompleted': isCompleted,
     };
   }
 
