@@ -236,20 +236,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Row(
-                    children: [
-                      const Spacer(),
-                      IconButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          icon: const Icon(
-                            Icons.close_rounded,
-                            color: Color(0xff808080),
-                            size: 30,
-                          ))
-                    ],
-                  ),
+                  const PopupCloseButton(),
                   const SizedBox(
                     height: 8,
                   ),
@@ -273,6 +260,31 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                 )
               ],
             )));
+  }
+}
+
+class PopupCloseButton extends StatelessWidget {
+  const PopupCloseButton({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        const Spacer(),
+        InkWell(
+          onTap: () {
+            Navigator.of(context).pop();
+          },
+          child: const Icon(
+            Icons.close_rounded,
+            color: Color(0xff808080),
+            size: 25,
+          ),
+        )
+      ],
+    );
   }
 }
 

@@ -23,16 +23,20 @@ class ExistingTasksProvider with ChangeNotifier {
   ValueNotifier<Task?> selected = ValueNotifier(null);
 
   List<String> existingTaskFilters = [];
-  ValueNotifier<String> selectedFilter = ValueNotifier("All");
+  List<String> typeFilters = [];
+  ValueNotifier<String?> selectedTimeframeFilter = ValueNotifier(null);
+  ValueNotifier<String?> selectedTypeFilter = ValueNotifier(null);
 
   init() {
     selected.value = null;
     _tasks = [];
     visibleTasks = [];
     isMarkingTaskForToday.value = false;
-    selectedFilter.value = "All";
+    selectedTimeframeFilter.value = null;
+    selectedTypeFilter.value = null;
     final tfs = timeframes.sublist(2);
-    existingTaskFilters = ["All", ...tfs];
+    existingTaskFilters = [...tfs];
+    typeFilters = ["Work", "Personal", "Self"];
   }
 
   Future<List<Task>> getTasksFromDb() async {
@@ -51,7 +55,7 @@ class ExistingTasksProvider with ChangeNotifier {
 
       _tasks = models;
       visibleTasks = [];
-      filterTasksByTimeframe(selectedFilter.value, true);
+      // filterTasksByTimeframe(selectedFilter.value, true);
       return _tasks;
     } catch (exception) {
       log("Error Logged in Appwrite call  - $exception");
@@ -88,38 +92,39 @@ class ExistingTasksProvider with ChangeNotifier {
   }
 
   void filterTasksByTimeframe(String tf, [bool overrideReturn = false]) {
-    log("Filterrr $tf");
-    if (!overrideReturn) {
-      if (tf == selectedFilter.value) return;
-    }
-    selected.value = null;
-    selectedFilter.value = tf;
-    visibleTasks = [];
+    selectedTimeframeFilter.value = tf;
+  //   log("Filterrr $tf");
+  //   if (!overrideReturn) {
+  //     if (tf == selectedFilter.value) return;
+  //   }
+  //   selected.value = null;
+  //   selectedFilter.value = tf;
+  //   visibleTasks = [];
 
-    if (tf == "All") {
-      visibleTasks = [..._tasks];
-      log("visibleTasksss $_tasks");
-    } else {
-      final now = DateTime.now();
-      List<Task> tempTasks = [];
-      final dr = getDurationFromFilterName(tf);
-      log("Filtering dr --> $tf");
-      for (Task element in _tasks) {
-        if (element.expectedCompletion == null) continue;
+  //   if (tf == "All") {
+  //     visibleTasks = [..._tasks];
+  //     log("visibleTasksss $_tasks");
+  //   } else {
+  //     final now = DateTime.now();
+  //     List<Task> tempTasks = [];
+  //     final dr = getDurationFromFilterName(tf);
+  //     log("Filtering dr --> $tf");
+  //     for (Task element in _tasks) {
+  //       if (element.expectedCompletion == null) continue;
         
-        var exp = element.expectedCompletion!.subtract(const Duration(days: 1));
+  //       var exp = element.expectedCompletion!.subtract(const Duration(days: 1));
 
-        if (!now.add(Duration(days: dr)).isBefore(exp)) {
-          tempTasks.add(element);
-        }
-      }
-      visibleTasks = [...tempTasks];
-    }
-    isLoadingTasks.value = true;
-    Future.delayed(const Duration(milliseconds: 300), () {
-      isLoadingTasks.value = false;
-    });
-  }
+  //       if (!now.add(Duration(days: dr)).isBefore(exp)) {
+  //         tempTasks.add(element);
+  //       }
+  //     }
+  //     visibleTasks = [...tempTasks];
+  //   }
+  //   isLoadingTasks.value = true;
+  //   Future.delayed(const Duration(milliseconds: 300), () {
+  //     isLoadingTasks.value = false;
+  //   });
+  // }
 }
 
 int getDurationFromFilterName(String tf) {
@@ -144,4 +149,5 @@ int getDurationFromFilterName(String tf) {
     default:
       return 0;
   }
+}
 }

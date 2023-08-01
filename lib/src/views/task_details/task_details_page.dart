@@ -234,20 +234,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                         content: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Row(
-                              children: [
-                                const Spacer(),
-                                IconButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                    icon: const Icon(
-                                      Icons.close_rounded,
-                                      color: Color(0xff808080),
-                                      size: 30,
-                                    ))
-                              ],
-                            ),
+                           const PopupCloseButton(),
                             const SizedBox(
                               height: 8,
                             ),
