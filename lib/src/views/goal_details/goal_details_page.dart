@@ -44,64 +44,68 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
     return Scaffold(
       appBar: _buildAppBar(),
       body: ValueListenableBuilder(
-        valueListenable: detailsProv.loadingGoal,
-        builder: (context, _, __) {
-          if(detailsProv.loadingGoal.value) {
-            return const Center(child: CircularProgressIndicator(),);
-          }
-          return  ValueListenableBuilder(
-              valueListenable: detailsProv.processing,
-              builder: (context, _, __) {
+          valueListenable: detailsProv.loadingGoal,
+          builder: (context, _, __) {
+            if (detailsProv.loadingGoal.value) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+            return ValueListenableBuilder(
+                valueListenable: detailsProv.processing,
+                builder: (context, _, __) {
+                  if (detailsProv.goal == null)
+                    return const Center(
+                      child: Text("Something went wrong!"),
+                    );
 
-                if(detailsProv.goal == null) return const Center(child: Text("Something went wrong!"),);
-
-                return Stack(
-                  children: [
-                    Positioned.fill(
-                      child: IgnorePointer(
-                        ignoring: detailsProv.processing.value,
-                        child: Opacity(
-                          opacity: detailsProv.processing.value ? 0.5 : 1,
-                          child: SingleChildScrollView(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  _buildPageHeader(context),
-                                  const SizedBox(height: 24),
-                                  _buildOptions(),
-                                  const SizedBox(height: 24),
-                                  SingleTaskPreviewDetailWidget(
-                                    title: "Goal",
-                                    value: detailsProv.goal!.title,
-                                    showDivider: true,
-                                  ),
-                                  SingleTaskPreviewDetailWidget(
-                                    title: "Type",
-                                    value: detailsProv.goal!.type,
-                                    showDivider: true,
-                                  ),
-                                  SingleTaskPreviewDetailWidget(
-                                    title: "Description",
-                                    value: detailsProv.goal!.description,
-                                    showDivider: false,
-                                  ),
-                                  const SizedBox(height: 50)
-                                ],
+                  return Stack(
+                    children: [
+                      Positioned.fill(
+                        child: IgnorePointer(
+                          ignoring: detailsProv.processing.value,
+                          child: Opacity(
+                            opacity: detailsProv.processing.value ? 0.5 : 1,
+                            child: SingleChildScrollView(
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 16),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    _buildPageHeader(context),
+                                    const SizedBox(height: 24),
+                                    _buildOptions(),
+                                    const SizedBox(height: 24),
+                                    SingleTaskPreviewDetailWidget(
+                                      title: "Goal",
+                                      value: detailsProv.goal!.title,
+                                      showDivider: true,
+                                    ),
+                                    SingleTaskPreviewDetailWidget(
+                                      title: "Type",
+                                      value: detailsProv.goal!.type,
+                                      showDivider: true,
+                                    ),
+                                    SingleTaskPreviewDetailWidget(
+                                      title: "Description",
+                                      value: detailsProv.goal!.description,
+                                      showDivider: false,
+                                    ),
+                                    const SizedBox(height: 50)
+                                  ],
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    if (detailsProv.processing.value)
-                      const Center(child: CircularProgressIndicator()),
-                  ],
-                );
-              });
-        }
-      ),
+                      if (detailsProv.processing.value)
+                        const Center(child: CircularProgressIndicator()),
+                    ],
+                  );
+                });
+          }),
       bottomSheet: _buildTasksByGoalsButton(),
     );
   }
@@ -117,7 +121,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
             state: detailsProv.isCompleted.value,
             title: "Complete",
             onTap: () {
-                detailsProv.toggleGoalComplete();
+              _showConfirmPopup();
             },
           ),
         ),
@@ -221,6 +225,54 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
       //   },
       // ),
     );
+  }
+
+  _showConfirmPopup() {
+    showDialog(
+        context: context,
+        builder: ((context) => AlertDialog(
+              // contentPadding: const EdgeInsets.all(20),
+              actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      const Spacer(),
+                      IconButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          icon: const Icon(
+                            Icons.close_rounded,
+                            color: Color(0xff808080),
+                            size: 30,
+                          ))
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 8,
+                  ),
+                  Center(
+                    child: Text(
+                      "You are about to mark this goal as ${detailsProv.isCompleted.value ? "Incomplete" : "Complete"}!",
+                      textAlign: TextAlign.center,
+                      style: AppTypography.title2,
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                PrimaryButton(
+                  title: "Confirm",
+                  onTap: () {
+                    detailsProv.toggleGoalComplete().then((value) {
+                      Navigator.of(context).pop();
+                    });
+                  },
+                )
+              ],
+            )));
   }
 }
 

@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:todo_sample/src/common_widgets/page_header.dart';
 import 'package:todo_sample/src/common_widgets/primary_appbar.dart';
 import 'package:todo_sample/src/common_widgets/primary_button.dart';
+import 'package:todo_sample/src/config/typography.dart';
 import 'package:todo_sample/src/providers/edit_tasks_provider.dart';
 import 'package:todo_sample/src/providers/task_details_provider.dart';
 import 'package:todo_sample/src/utils/utils.dart';
@@ -65,7 +66,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                           children: [
                             _buildPageHeader(context),
                             const SizedBox(height: 24),
-                            _buildOptions() , 
+                            _buildOptions(),
                             const SizedBox(height: 24),
                             const SizedBox(height: 32),
                             SingleTaskPreviewDetailWidget(
@@ -180,7 +181,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
             state: detailsProvider.isCompleted.value,
             title: "Complete",
             onTap: () {
-              detailsProvider.toggleTaskComplete(widget.task);
+             _showConfirmPopup();
             },
           ),
         ),
@@ -222,5 +223,53 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
       //   ),
       // ),
     );
+  }
+
+  _showConfirmPopup() {
+     showDialog(
+                  context: context,
+                  builder: ((context) => AlertDialog(
+                        // contentPadding: const EdgeInsets.all(20),
+                        actionsPadding: const EdgeInsets.fromLTRB(24,0, 24, 24),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Row(
+                              children: [
+                                const Spacer(),
+                                IconButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    icon: const Icon(
+                                      Icons.close_rounded,
+                                      color: Color(0xff808080),
+                                      size: 30,
+                                    ))
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 8,
+                            ),
+                            Center(
+                              child: Text(
+                                "You are about to mark this task as ${detailsProvider.isCompleted.value ? "Incomplete" : "Complete"}!",
+                                textAlign: TextAlign.center,
+                                style: AppTypography.title2,
+                              ),
+                            ),
+                          ],
+                        ),
+                        actions: [
+                          PrimaryButton(
+                            title: "Confirm",
+                            onTap: () {
+                              detailsProvider.toggleTaskComplete(widget.task).then((value) {
+                                Navigator.of(context).pop();
+                              });
+                            },
+                          )
+                        ],
+                      )));
   }
 }
