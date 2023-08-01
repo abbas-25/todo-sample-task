@@ -74,7 +74,10 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     _buildPageHeader(context),
-                                    const SizedBox(height: 24),
+                                    if(detailsProv.isCompleted.value)...[
+                                      const CompleteWidget(text:"This goal is complete"), 
+                                    ], 
+                                    const SizedBox(height: 32),
                                     _buildOptions(),
                                     const SizedBox(height: 24),
                                     SingleTaskPreviewDetailWidget(
@@ -260,6 +263,25 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                 )
               ],
             )));
+  }
+}
+
+class CompleteWidget extends StatelessWidget {
+  final String text;
+  const CompleteWidget({
+    Key? key,
+    required this.text,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        SvgPicture.asset("assets/icons/complete-tick.svg", height: 20, width: 20,),
+        const SizedBox(width: 4,), 
+        Text(text, style: AppTypography.subtitle2.copyWith(fontWeight: FontWeight.w400, color: const Color(0xff555555)),)
+      ],
+    );
   }
 }
 

@@ -65,7 +65,15 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _buildPageHeader(context),
-                            const SizedBox(height: 24),
+                            ValueListenableBuilder(
+                                valueListenable: detailsProvider.isCompleted,
+                                builder: (context, _, __) {
+                                  if (!detailsProvider.isCompleted.value)
+                                    return const Text("");
+                                  return const CompleteWidget(
+                                      text: "This task is complete");
+                                }),
+                            const SizedBox(height: 32),
                             _buildOptions(),
                             const SizedBox(height: 24),
                             const SizedBox(height: 32),
@@ -181,7 +189,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
             state: detailsProvider.isCompleted.value,
             title: "Complete",
             onTap: () {
-             _showConfirmPopup();
+              _showConfirmPopup();
             },
           ),
         ),
@@ -226,37 +234,39 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
   }
 
   _showConfirmPopup() {
-     showDialog(
-                  context: context,
-                  builder: ((context) => AlertDialog(
-                        // contentPadding: const EdgeInsets.all(20),
-                        actionsPadding: const EdgeInsets.fromLTRB(24,0, 24, 24),
-                        content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                           const PopupCloseButton(),
-                            const SizedBox(
-                              height: 8,
-                            ),
-                            Center(
-                              child: Text(
-                                "You are about to mark this task as ${detailsProvider.isCompleted.value ? "Incomplete" : "Complete"}!",
-                                textAlign: TextAlign.center,
-                                style: AppTypography.title2,
-                              ),
-                            ),
-                          ],
-                        ),
-                        actions: [
-                          PrimaryButton(
-                            title: "Confirm",
-                            onTap: () {
-                              detailsProvider.toggleTaskComplete(widget.task).then((value) {
-                                Navigator.of(context).pop();
-                              });
-                            },
-                          )
-                        ],
-                      )));
+    showDialog(
+        context: context,
+        builder: ((context) => AlertDialog(
+              // contentPadding: const EdgeInsets.all(20),
+              actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const PopupCloseButton(),
+                  const SizedBox(
+                    height: 8,
+                  ),
+                  Center(
+                    child: Text(
+                      "You are about to mark this task as ${detailsProvider.isCompleted.value ? "Incomplete" : "Complete"}!",
+                      textAlign: TextAlign.center,
+                      style: AppTypography.title2,
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                PrimaryButton(
+                  title: "Confirm",
+                  onTap: () {
+                    detailsProvider
+                        .toggleTaskComplete(widget.task)
+                        .then((value) {
+                      Navigator.of(context).pop();
+                    });
+                  },
+                )
+              ],
+            )));
   }
 }

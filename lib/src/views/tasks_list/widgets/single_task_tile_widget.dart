@@ -8,6 +8,7 @@ import 'package:todo_sample/src/models/task.dart';
 import 'package:todo_sample/src/providers/today_tasks_list_provider.dart';
 import 'package:todo_sample/src/routes/routes.dart';
 import 'package:todo_sample/src/utils/utils.dart';
+import 'package:todo_sample/src/views/goal_details/goal_details_page.dart';
 
 class SingleTaskTileWidget extends StatelessWidget {
   final Task task;
@@ -57,6 +58,9 @@ class SingleTaskTileWidget extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    if (task.isCompleted ?? false) ...[
+                      const CompleteWidget(text: "Complete"),
+                    ],
                     Text(
                       task.title,
                       overflow: TextOverflow.ellipsis,
