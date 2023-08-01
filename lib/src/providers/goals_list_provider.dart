@@ -17,6 +17,14 @@ class GoalsListProvider with ChangeNotifier {
   List<Goal> goals = [];
   bool isLoadingGoals = true;
 
+  ValueNotifier<String?> selectedTypeFilter = ValueNotifier(null);
+
+  List<String>  typeFilters = ["Work", "Personal", "Self"];
+
+  reset() {
+    selectedTypeFilter.value = null;
+  }
+
   Future<List<Goal>> getGoalsFromDb() async {
     try {
       isLoadingGoals = true;

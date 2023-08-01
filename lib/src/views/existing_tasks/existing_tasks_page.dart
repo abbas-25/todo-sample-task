@@ -243,13 +243,7 @@ class FilterItem extends StatelessWidget {
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           color: const Color(0xffF2F2F2),
-          boxShadow: [
-            // BoxShadow(
-            //   blurRadius: 20,
-            //   color: Colors.black.withOpacity(0.05),
-            //   offset: const Offset(0, 4),
-            // )
-          ]),
+          ),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Center(
           child: Text(
@@ -337,7 +331,7 @@ class _TypeFilter extends StatelessWidget {
                   children: [
                     Text(prov.selectedTypeFilter.value ?? "Type",
                         style: AppTypography.input.copyWith(
-                            color: prov.selectedTimeframeFilter.value != null
+                            color: prov.selectedTypeFilter.value != null
                                 ? Colors.white
                                 : AppTypography.textDefaultColor)),
                     const SizedBox(
@@ -345,7 +339,7 @@ class _TypeFilter extends StatelessWidget {
                     ),
                     Icon(
                       Icons.keyboard_arrow_down_rounded,
-                      color: prov.selectedTimeframeFilter.value != null
+                      color: prov.selectedTypeFilter.value != null
                           ? Colors.white
                           : const Color(0xff404040),
                     ),
