@@ -70,7 +70,7 @@ class Goal {
 
   @override
   String toString() {
-    return 'Goal(id: $id, title: $title, type: $type, description: $description, isCompleted: $isCompleted)';
+    return title;
   }
 
   @override

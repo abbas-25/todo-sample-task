@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_sample/src/common_widgets/primary_appbar.dart';
@@ -47,7 +49,7 @@ class _GoalsListPageState extends State<GoalsListPage> {
             // filters
             Row(
               children: [
-                _TypeFilter(prov: prov),
+                _TypeFilter(),
               ],
             ),
 
@@ -56,16 +58,16 @@ class _GoalsListPageState extends State<GoalsListPage> {
               child: Consumer<GoalsListProvider>(builder: (context, prov, __) {
                 if (prov.isLoadingGoals) {
                   return const Center(child: CircularProgressIndicator());
-                } else if (prov.goals.isEmpty) {
+                } else if (prov.visibleGoals.isEmpty) {
                   return const Center(child: Text("No Goals Created!"));
                 }
 
                 return ListView.builder(
-                    itemCount: prov.goals.length,
+                    itemCount: prov.visibleGoals.length,
                     itemBuilder: (context, index) {
                       return Column(
                         children: [
-                          SingleGoalTileWidget(goal: prov.goals[index]),
+                          SingleGoalTileWidget(goal: prov.visibleGoals[index]),
                           const SizedBox(height: 16),
                         ],
                       );
@@ -87,7 +89,7 @@ class _GoalsListPageState extends State<GoalsListPage> {
     return Consumer<GoalsListProvider>(builder: (context, prov, __) {
       return PageHeader(
         title: "Goals",
-        subtitle: "${prov.goals.length} Goals",
+        subtitle: "${prov.visibleGoals.length} Goals",
         trailingIcon: InkWell(
           onTap: () {
             Navigator.of(context).pushNamed(Routes.newGoal);
@@ -109,101 +111,94 @@ class _GoalsListPageState extends State<GoalsListPage> {
   }
 }
 
-
 class _TypeFilter extends StatelessWidget {
-  const _TypeFilter({
-    required this.prov,
-  });
-
-  final GoalsListProvider prov;
-
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-        valueListenable: prov.selectedTypeFilter,
-        builder: (context, _, __) {
-          return SizedBox(
-            height: 40,
-            child: InkWell(
-              onTap: () {
-                showDialog(
-                    context: context,
-                    builder: (_) {
-                      return AlertDialog(
-                        content: SizedBox(
-                          width: double.maxFinite,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const PopupCloseButton(),
-                              Center(
-                                  child: Text(
-                                "Type",
-                                style: AppTypography.title
-                                    .copyWith(fontWeight: FontWeight.w500),
-                              )),
-                              const SizedBox(
-                                height: 24,
-                              ),
-                              Flexible(
-                                child: ListView.builder(
-                                    shrinkWrap: true,
-                                    itemCount: prov.typeFilters.length,
-                                    itemBuilder: (context, index) {
-                                      final item = prov.typeFilters[index];
-                                      return InkWell(
-                                        onTap: () {
-                                          // prov.filterTasksByTimeframe(item);
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: Column(
-                                          children: [
-                                            FilterItem(item: item),
-                                            const SizedBox(
-                                              height: 8,
-                                            )
-                                          ],
-                                        ),
-                                      );
-                                    }),
-                              ),
-                            ],
+    final GoalsListProvider prov =
+        Provider.of<GoalsListProvider>(context, listen: false);
+    return Consumer<GoalsListProvider>(builder: (context, _, __) {
+      log("TF refreshing");
+      return SizedBox(
+        height: 40,
+        child: InkWell(
+          onTap: () {
+            showDialog(
+                context: context,
+                builder: (_) {
+                  return AlertDialog(
+                    content: SizedBox(
+                      width: double.maxFinite,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const PopupCloseButton(),
+                          Center(
+                              child: Text(
+                            "Type",
+                            style: AppTypography.title
+                                .copyWith(fontWeight: FontWeight.w500),
+                          )),
+                          const SizedBox(
+                            height: 24,
                           ),
-                        ),
-                      );
-                    });
-              },
-              child: Container(
-                margin: const EdgeInsets.only(right: 12),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  color: prov.selectedTypeFilter.value != null
-                      ? AppTheme.primaryColor
-                      : const Color(0xffEDF3FF),
-                ),
-                child: Row(
-                  children: [
-                    Text(prov.selectedTypeFilter.value ?? "Type",
-                        style: AppTypography.input.copyWith(
-                            color: prov.selectedTypeFilter.value != null
-                                ? Colors.white
-                                : AppTypography.textDefaultColor)),
-                    const SizedBox(
-                      width: 7.75,
+                          Flexible(
+                            child: ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: prov.typeFilters.length,
+                                itemBuilder: (context, index) {
+                                  final item = prov.typeFilters[index];
+                                  return InkWell(
+                                    onTap: () {
+                                      prov.filterGoalsByType(item);
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Column(
+                                      children: [
+                                        FilterItem(item: item),
+                                        const SizedBox(
+                                          height: 8,
+                                        )
+                                      ],
+                                    ),
+                                  );
+                                }),
+                          ),
+                        ],
+                      ),
                     ),
-                    Icon(
-                      Icons.keyboard_arrow_down_rounded,
-                      color: prov.selectedTypeFilter.value != null
-                          ? Colors.white
-                          : const Color(0xff404040),
-                    ),
-                  ],
-                ),
-              ),
+                  );
+                });
+          },
+          child: Container(
+            margin: const EdgeInsets.only(right: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              color: prov.selectedTypeFilter.value != null
+                  ? AppTheme.primaryColor
+                  : const Color(0xffEDF3FF),
             ),
-          );
-        });
+            child: Row(
+              children: [
+                Text(prov.selectedTypeFilter.value ?? "Type",
+                    style: AppTypography.input.copyWith(
+                        color: prov.selectedTypeFilter.value != null
+                            ? Colors.white
+                            : AppTypography.textDefaultColor)),
+                const SizedBox(
+                  width: 7.75,
+                ),
+                Icon(
+                  Icons.keyboard_arrow_down_rounded,
+                  color: prov.selectedTypeFilter.value != null
+                      ? Colors.white
+                      : const Color(0xff404040),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    });
   }
 }

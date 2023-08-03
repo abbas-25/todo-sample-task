@@ -14,12 +14,13 @@ class GoalsListProvider with ChangeNotifier {
     required this.db,
   });
 
-  List<Goal> goals = [];
+  List<Goal> _goals = [];
+  List<Goal> visibleGoals = [];
   bool isLoadingGoals = true;
 
   ValueNotifier<String?> selectedTypeFilter = ValueNotifier(null);
 
-  List<String>  typeFilters = ["Work", "Personal", "Self"];
+  List<String> typeFilters = ["Work", "Personal", "Self"];
 
   reset() {
     selectedTypeFilter.value = null;
@@ -39,8 +40,8 @@ class GoalsListProvider with ChangeNotifier {
       for (var t in response.documents) {
         models.add(Goal.fromAppwriteDoc(t));
       }
-
-      return goals = models;
+      visibleGoals = [...models];
+      return _goals = [...models];
     } catch (exception) {
       log("Error Logged in Appwrite call  - $exception");
       return [];
@@ -48,5 +49,14 @@ class GoalsListProvider with ChangeNotifier {
       isLoadingGoals = false;
       notifyListeners();
     }
+  }
+
+  void filterGoalsByType(String tf) {
+    final g = _goals.where((element) {
+      return element.type.toLowerCase().contains(tf.toLowerCase());
+    }).toList();
+    visibleGoals = [...g];
+    selectedTypeFilter.value = tf;
+    notifyListeners();
   }
 }

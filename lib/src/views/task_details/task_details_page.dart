@@ -68,8 +68,9 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                             ValueListenableBuilder(
                                 valueListenable: detailsProvider.isCompleted,
                                 builder: (context, _, __) {
-                                  if (!detailsProvider.isCompleted.value)
+                                  if (!detailsProvider.isCompleted.value) {
                                     return const Text("");
+                                  }
                                   return const CompleteWidget(
                                       text: "This task is complete");
                                 }),

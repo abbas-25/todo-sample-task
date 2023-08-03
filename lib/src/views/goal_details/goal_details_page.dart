@@ -54,10 +54,11 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
             return ValueListenableBuilder(
                 valueListenable: detailsProv.processing,
                 builder: (context, _, __) {
-                  if (detailsProv.goal == null)
+                  if (detailsProv.goal == null) {
                     return const Center(
                       child: Text("Something went wrong!"),
                     );
+                  }
 
                   return Stack(
                     children: [
