@@ -54,8 +54,8 @@ class ExistingTasksProvider with ChangeNotifier {
       }
 
       _tasks = models;
-      visibleTasks = [];
-      // filterTasksByTimeframe(selectedFilter.value, true);
+      visibleTasks = [..._tasks];
+      // filterTasks(selectedFilter.value, true);
       return _tasks;
     } catch (exception) {
       log("Error Logged in Appwrite call  - $exception");
@@ -91,63 +91,105 @@ class ExistingTasksProvider with ChangeNotifier {
     }
   }
 
-  void filterTasksByTimeframe(String tf, [bool overrideReturn = false]) {
-    selectedTimeframeFilter.value = tf;
-  //   log("Filterrr $tf");
-  //   if (!overrideReturn) {
-  //     if (tf == selectedFilter.value) return;
-  //   }
-  //   selected.value = null;
-  //   selectedFilter.value = tf;
-  //   visibleTasks = [];
+  void filterTasks(
+      {String? timeframe, String? type, bool overrideReturn = false}) {
+    if (timeframe != null) {
+      selectedTimeframeFilter.value = timeframe;
+    }
+    if (type != null) {
+      selectedTypeFilter.value = type;
+    }
+    visibleTasks = [];
 
-  //   if (tf == "All") {
-  //     visibleTasks = [..._tasks];
-  //     log("visibleTasksss $_tasks");
-  //   } else {
-  //     final now = DateTime.now();
-  //     List<Task> tempTasks = [];
-  //     final dr = getDurationFromFilterName(tf);
-  //     log("Filtering dr --> $tf");
-  //     for (Task element in _tasks) {
-  //       if (element.expectedCompletion == null) continue;
-        
-  //       var exp = element.expectedCompletion!.subtract(const Duration(days: 1));
+    if (selectedTimeframeFilter.value != null && selectedTypeFilter.value != null) {
+      final filtered = _filterBasedOnTimeFrame(selectedTimeframeFilter.value!);
+      final temp = filtered.where((element) {
+        return element.type.toLowerCase().contains(selectedTypeFilter.value!.toLowerCase());
+      });
+      visibleTasks = [...temp];
+    } else if (selectedTimeframeFilter.value != null) {
+      final temp = _filterBasedOnTimeFrame(selectedTimeframeFilter.value!);
+      visibleTasks = [...temp];
+    } else if (selectedTypeFilter.value != null) {
+      final temp = _tasks.where((element) {
+        return element.type.toLowerCase().contains(selectedTypeFilter.value!.toLowerCase());
+      });
+      visibleTasks = [...temp];
+    }
 
-  //       if (!now.add(Duration(days: dr)).isBefore(exp)) {
-  //         tempTasks.add(element);
-  //       }
-  //     }
-  //     visibleTasks = [...tempTasks];
-  //   }
-  //   isLoadingTasks.value = true;
-  //   Future.delayed(const Duration(milliseconds: 300), () {
-  //     isLoadingTasks.value = false;
-  //   });
-  // }
-}
+    notifyListeners();
+    //   log("Filterrr $tf");
+    //   if (!overrideReturn) {
+    //     if (tf == selectedFilter.value) return;
+    //   }
+    //   selected.value = null;
+    //   selectedFilter.value = tf;
+    //   visibleTasks = [];
 
-int getDurationFromFilterName(String tf) {
-  switch (tf.toLowerCase()) {
-    /// [not required conditions]
-    // case "None":
-    //   return null;
-    // case "Today":
-    //   return const Duration(days: 1);
-    case "3 days":
-      return 3;
-    case "week":
-      return 7;
-    case "fortnight":
-      return 14;
-    case "month":
-      return 30;
-    case "90 days":
-      return 90;
-    case "year":
-      return 365;
-    default:
-      return 0;
+    //   if (tf == "All") {
+    //     visibleTasks = [..._tasks];
+    //     log("visibleTasksss $_tasks");
+    //   } else {
+    //     final now = DateTime.now();
+    //     List<Task> tempTasks = [];
+    //     final dr = getDurationFromFilterName(tf);
+    //     log("Filtering dr --> $tf");
+    //     for (Task element in _tasks) {
+    //       if (element.expectedCompletion == null) continue;
+
+    //       var exp = element.expectedCompletion!.subtract(const Duration(days: 1));
+
+    //       if (!now.add(Duration(days: dr)).isBefore(exp)) {
+    //         tempTasks.add(element);
+    //       }
+    //     }
+    //     visibleTasks = [...tempTasks];
+    //   }
+    //   isLoadingTasks.value = true;
+    //   Future.delayed(const Duration(milliseconds: 300), () {
+    //     isLoadingTasks.value = false;
+    //   });
+    // }
   }
-}
+
+  List<Task> _filterBasedOnTimeFrame(String tf) {
+    final now = DateTime.now();
+    List<Task> tempTasks = [];
+    final dr = getDurationFromFilterName(tf);
+    log("Filtering dr --> $tf");
+    for (Task element in _tasks) {
+      if (element.expectedCompletion == null) continue;
+
+      var exp = element.expectedCompletion!.subtract(const Duration(days: 1));
+
+      if (!now.add(Duration(days: dr)).isBefore(exp)) {
+        tempTasks.add(element);
+      }
+    }
+    return tempTasks;
+  }
+
+  int getDurationFromFilterName(String tf) {
+    switch (tf.toLowerCase()) {
+      /// [not required conditions]
+      // case "None":
+      //   return null;
+      // case "Today":
+      //   return const Duration(days: 1);
+      case "3 days":
+        return 3;
+      case "week":
+        return 7;
+      case "fortnight":
+        return 14;
+      case "month":
+        return 30;
+      case "90 days":
+        return 90;
+      case "year":
+        return 365;
+      default:
+        return 0;
+    }
+  }
 }

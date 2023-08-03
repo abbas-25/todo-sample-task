@@ -51,12 +51,12 @@ class GoalsListProvider with ChangeNotifier {
     }
   }
 
-  void filterGoalsByType(String tf) {
+  void filterGoalsByType(String type) {
     final g = _goals.where((element) {
-      return element.type.toLowerCase().contains(tf.toLowerCase());
+      return element.type.toLowerCase().contains(type.toLowerCase());
     }).toList();
     visibleGoals = [...g];
-    selectedTypeFilter.value = tf;
+    selectedTypeFilter.value = type;
     notifyListeners();
   }
 }

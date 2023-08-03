@@ -150,6 +150,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
                                       priority: priority!,
                                       timeframe: timeframe!,
                                       description: descController.text.trim(),
+                                      isCompleted: false, 
                                     );
 
                                     task = task.copyWith(

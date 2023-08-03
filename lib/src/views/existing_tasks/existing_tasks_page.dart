@@ -74,17 +74,21 @@ class _ExistingTasksPageState extends State<ExistingTasksPage> {
                       );
                     }
 
-                    return ListView.builder(
-                        itemCount: prov.visibleTasks.length,
-                        itemBuilder: (context, index) {
-                          return Column(
-                            children: [
-                              SingleExistingTaskTile(
-                                  task: prov.visibleTasks[index]),
-                              const SizedBox(height: 16),
-                            ],
-                          );
-                        });
+                    return Consumer<ExistingTasksProvider>(
+                      builder: (context, _, __) {
+                        return ListView.builder(
+                            itemCount: prov.visibleTasks.length,
+                            itemBuilder: (context, index) {
+                              return Column(
+                                children: [
+                                  SingleExistingTaskTile(
+                                      task: prov.visibleTasks[index]),
+                                  const SizedBox(height: 16),
+                                ],
+                              );
+                            });
+                      }
+                    );
                   }),
             ),
             const SizedBox(
@@ -174,7 +178,7 @@ class _TimeframeFilter extends StatelessWidget {
                                           prov.existingTaskFilters[index];
                                       return InkWell(
                                         onTap: () {
-                                          prov.filterTasksByTimeframe(item);
+                                          prov.filterTasks(timeframe: item);
                                           Navigator.of(context).pop();
                                         },
                                         child: Column(
@@ -263,8 +267,7 @@ class _TypeFilter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-        valueListenable: prov.selectedTypeFilter,
+    return Consumer<ExistingTasksProvider>(
         builder: (context, _, __) {
           return SizedBox(
             height: 40,
@@ -297,7 +300,7 @@ class _TypeFilter extends StatelessWidget {
                                       final item = prov.typeFilters[index];
                                       return InkWell(
                                         onTap: () {
-                                          prov.filterTasksByTimeframe(item);
+                                          prov.filterTasks(type: item);
                                           Navigator.of(context).pop();
                                         },
                                         child: Column(
