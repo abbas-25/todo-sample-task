@@ -564,7 +564,13 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                 ]),
                 actions: [
                   PrimaryButton(
-                    icon: Image.asset(stopWatchTimer.isRunning ? "assets/icons/stop.png" : "assets/icons/start.png", height: 28, width: 28,),
+                      icon: Image.asset(
+                        stopWatchTimer.isRunning
+                            ? "assets/icons/stop.png"
+                            : "assets/icons/start.png",
+                        height: 28,
+                        width: 28,
+                      ),
                       title: stopWatchTimer.isRunning ? "Stop" : "Start",
                       onTap: () {
                         if (stopWatchTimer.isRunning) {
