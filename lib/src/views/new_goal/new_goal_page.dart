@@ -88,6 +88,9 @@ class _NewGoalPageState extends State<NewGoalPage> {
                                       title: titleController.text.trim(),
                                       type: type!,
                                       description: descController.text.trim(),
+                                      createdAt: DateTime.now(), 
+                                      totalMinutesSpent: 0, 
+                                      updatedAt: DateTime.now()
                                     ))
                                     .then(
                                         (value) => Navigator.of(context).pop());

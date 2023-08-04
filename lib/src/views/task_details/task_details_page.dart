@@ -1,4 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -50,154 +52,156 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
     return Scaffold(
       appBar: _buildAppBar(),
       body: ValueListenableBuilder(
-          valueListenable: detailsProvider.isLoadingTaskAndGoal,
+          valueListenable: detailsProvider.task,
           builder: (context, _, __) {
-            return ValueListenableBuilder(
-                valueListenable: detailsProvider.task,
-                builder: (context, _, __) {
-                  if (detailsProvider.isLoadingTaskAndGoal.value) {
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
+            log("TSK refreshing");
+            if (detailsProvider.task.value == null) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
 
-                  final task = detailsProvider.task.value!;
-                  return Consumer<EditTaskProvider>(
-                    builder: (context, prov, __) {
-                      return Stack(
-                        children: [
-                          Positioned.fill(
-                            child: IgnorePointer(
-                              ignoring: prov.isProcessing,
-                              child: Opacity(
-                                opacity: prov.isProcessing ? 0.5 : 1,
-                                child: SingleChildScrollView(
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 16),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        _buildPageHeader(context),
-                                        ValueListenableBuilder(
-                                            valueListenable:
-                                                detailsProvider.isCompleted,
-                                            builder: (context, _, __) {
-                                              if (!detailsProvider
-                                                  .isCompleted.value) {
-                                                return const Text("");
-                                              }
-                                              return const CompleteWidget(
-                                                  text:
-                                                      "This task is complete");
-                                            }),
-                                        const SizedBox(height: 32),
-                                        _buildOptions(),
-                                        const SizedBox(height: 24),
-                                        const SizedBox(height: 32),
-                                        SingleTaskPreviewDetailWidget(
-                                          title: "Task",
-                                          value: task.title,
-                                          showDivider: true,
-                                        ),
-                                        SingleTaskPreviewDetailWidget(
-                                          title: "Type",
-                                          value: Utils.capitalizeWord(
-                                              task.getTaskTypeString),
-                                          showDivider: true,
-                                        ),
-                                        SingleTaskPreviewDetailWidget(
-                                          title: "Priority",
-                                          value: Utils.capitalizeWord(
-                                              task.getTaskPriorityString),
-                                          showDivider: true,
-                                        ),
-                                        SingleTaskPreviewDetailWidget(
-                                          title: "Timeframe",
-                                          value: Utils.capitalizeWord(
-                                              task.timeframe),
-                                          showDivider: true,
-                                        ),
-                                        SingleTaskPreviewDetailWidget(
-                                          title: "Description",
-                                          value: task.description,
-                                          showDivider: true,
-                                        ),
-                                        ValueListenableBuilder(
-                                            valueListenable:
-                                                detailsProvider.task,
-                                            builder: (context, _, __) {
-                                              return SingleTaskPreviewDetailWidget(
-                                                title: "Total Time Spent",
-                                                value: Utils
-                                                    .hoursAndMinutesByMinutes(
-                                                        task.totalMinutesSpent ??
-                                                            0),
-                                                showDivider: true,
-                                              );
-                                            }),
-                                        SingleTaskPreviewDetailWidget(
-                                          title: "Last Activity",
-                                          value: DateFormat(
-                                                  "dd MMM, yyyy | HH:mm a")
-                                              .format(task.updatedAt ??
-                                                  task.createdAt),
-                                          showDivider: true,
-                                        ),
-                                        if (task.goalId != null)
-                                          ValueListenableBuilder(
-                                              valueListenable: detailsProvider
-                                                  .isLoadingTaskAndGoal,
-                                              builder: (context, _, __) {
-                                                return detailsProvider
-                                                                .goal.value ==
-                                                            null ||
-                                                        detailsProvider
-                                                            .isLoadingTaskAndGoal
-                                                            .value
-                                                    ? const Text('')
-                                                    : SingleTaskPreviewDetailWidget(
-                                                        title: "Goal",
-                                                        value: detailsProvider
-                                                                .goal
-                                                                .value
-                                                                ?.title ??
-                                                            "",
-                                                        showDivider: false,
-                                                      );
-                                              }),
-                                        const SizedBox(height: 100)
-                                      ],
-                                    ),
+            final task = detailsProvider.task.value!;
+            return Consumer<EditTaskProvider>(
+              builder: (context, prov, __) {
+                return Stack(
+                  children: [
+                    Positioned.fill(
+                      child: IgnorePointer(
+                        ignoring: prov.isProcessing,
+                        child: Opacity(
+                          opacity: prov.isProcessing ? 0.5 : 1,
+                          child: SingleChildScrollView(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16),
+                              child: Column(
+                                crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                children: [
+                                  _buildPageHeader(context),
+                                  ValueListenableBuilder(
+                                      valueListenable:
+                                          detailsProvider.isCompleted,
+                                      builder: (context, _, __) {
+                                        if (!detailsProvider
+                                            .isCompleted.value) {
+                                          return const Text("");
+                                        }
+                                        return const CompleteWidget(
+                                            text:
+                                                "This task is complete");
+                                      }),
+                                  const SizedBox(height: 32),
+                                  _buildOptions(),
+                                  const SizedBox(height: 24),
+                                  const SizedBox(height: 32),
+                                  SingleTaskPreviewDetailWidget(
+                                    title: "Task",
+                                    value: task.title,
+                                    showDivider: true,
                                   ),
-                                ),
+                                  SingleTaskPreviewDetailWidget(
+                                    title: "Type",
+                                    value: Utils.capitalizeWord(
+                                        task.getTaskTypeString),
+                                    showDivider: true,
+                                  ),
+                                  SingleTaskPreviewDetailWidget(
+                                    title: "Priority",
+                                    value: Utils.capitalizeWord(
+                                        task.getTaskPriorityString),
+                                    showDivider: true,
+                                  ),
+                                  SingleTaskPreviewDetailWidget(
+                                    title: "Timeframe",
+                                    value: Utils.capitalizeWord(
+                                        task.timeframe),
+                                    showDivider: true,
+                                  ),
+                                  SingleTaskPreviewDetailWidget(
+                                    title: "Description",
+                                    value: task.description,
+                                    showDivider: true,
+                                  ),
+                                  ValueListenableBuilder(
+                                      valueListenable:
+                                          detailsProvider.task,
+                                      builder: (context, _, __) {
+                                        return SingleTaskPreviewDetailWidget(
+                                          title: "Total Time Spent",
+                                          value: Utils
+                                              .hoursAndMinutesByMinutes(
+                                                  task.totalMinutesSpent ??
+                                                      0),
+                                          showDivider: true,
+                                        );
+                                      }),
+                                  SingleTaskPreviewDetailWidget(
+                                    title: "Last Activity",
+                                    value: DateFormat(
+                                            "dd MMM, yyyy | HH:mm a")
+                                        .format(task.updatedAt ??
+                                            task.createdAt),
+                                    showDivider: true,
+                                  ),
+                                  if (task.goalId != null)
+                                    ValueListenableBuilder(
+                                        valueListenable:
+                                            detailsProvider
+                                                .isLoadingTaskAndGoal,
+                                        builder: (context, _, __) {
+                                          return detailsProvider.goal
+                                                          .value ==
+                                                      null ||
+                                                  detailsProvider
+                                                      .isLoadingTaskAndGoal
+                                                      .value
+                                              ? const Text('')
+                                              : SingleTaskPreviewDetailWidget(
+                                                  title: "Goal",
+                                                  value: detailsProvider
+                                                          .goal
+                                                          .value
+                                                          ?.title ??
+                                                      "",
+                                                  showDivider: false,
+                                                );
+                                        }),
+                                  const SizedBox(height: 100)
+                                ],
                               ),
                             ),
                           ),
-                          if (prov.isProcessing)
-                            const Center(child: CircularProgressIndicator()),
-                        ],
-                      );
-                    },
-                  );
-                });
+                        ),
+                      ),
+                    ),
+                    if (prov.isProcessing)
+                      const Center(
+                          child: CircularProgressIndicator()),
+                  ],
+                );
+              },
+            );
           }),
       bottomSheet: ValueListenableBuilder(
           valueListenable: detailsProvider.task,
           builder: (context, _, __) {
-            if (detailsProvider.isLoadingTaskAndGoal.value) {
-              return const SizedBox.shrink();
-            }
+            // if (detailsProvider.isLoadingTaskAndGoal.value) {
+            //   return const SizedBox.shrink();
+            // }
 
-            final task = detailsProvider.task.value!;
+            final task = detailsProvider.task.value;
+            if(task == null) return const SizedBox.shrink();
+
             return Padding(
               padding: const EdgeInsets.all(20),
               child: ValueListenableBuilder(
                   valueListenable: detailsProvider.isMarkingTaskForToday,
                   builder: (context, _, __) {
                     return PrimaryButton(
-                        isLoading: detailsProvider.isMarkingTaskForToday.value,
+                        isLoading:
+                            detailsProvider.isMarkingTaskForToday.value,
                         title: task.isMarkedForToday
                             ? "Remove From Today's Task"
                             : "Move to Today's Task",
@@ -535,7 +539,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
   }
 
   _showStopwatchEntryPopup() {
-    final StopWatchTimer _stopWatchTimer = StopWatchTimer(); // Create instance.
+    final StopWatchTimer stopWatchTimer = StopWatchTimer(); // Create instance.
     showDialog(
         barrierDismissible: false,
         context: context,
@@ -548,7 +552,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                 content: Column(mainAxisSize: MainAxisSize.min, children: [
                   PopupCloseButton(
                     callBeforeClosing: () {
-                      _stopWatchTimer.dispose();
+                      stopWatchTimer.dispose();
                     },
                   ),
                   const SizedBox(
@@ -571,7 +575,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                         const SizedBox(height: 32),
 
                         StreamBuilder(
-                          stream: _stopWatchTimer.rawTime,
+                          stream: stopWatchTimer.rawTime,
                           initialData: 0,
                           builder: (context, snap) {
                             final value = snap.data;
@@ -586,7 +590,11 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                               hoursRightBreak: "h:",
                               minuteRightBreak: "m",
                             );
-                            return Text("${displayTime}m", style: AppTypography.headline1.copyWith(fontSize: 48, fontWeight: FontWeight.w400),);
+                            return Text(
+                              "${displayTime}m",
+                              style: AppTypography.headline1.copyWith(
+                                  fontSize: 48, fontWeight: FontWeight.w400),
+                            );
                           },
                         ),
                         const SizedBox(height: 24),
@@ -598,16 +606,17 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                 ]),
                 actions: [
                   PrimaryButton(
-                      title: _stopWatchTimer.isRunning ? "Stop" :  "Start",
+                    icon: Image.asset(stopWatchTimer.isRunning ? "assets/icons/stop.png" : "assets/icons/start.png", height: 28, width: 28,),
+                      title: stopWatchTimer.isRunning ? "Stop" : "Start",
                       onTap: () {
-                        if (_stopWatchTimer.isRunning) {
-                          _stopWatchTimer.onStopTimer();
+                        if (stopWatchTimer.isRunning) {
+                          stopWatchTimer.onStopTimer();
                           detailsProvider.updateTotalTime(
-                              minutes: _stopWatchTimer.minuteTime.value);
-                          _stopWatchTimer.dispose();
+                              minutes: stopWatchTimer.minuteTime.value);
+                          stopWatchTimer.dispose();
                           Navigator.of(context).pop();
                         } else {
-                          _stopWatchTimer.onStartTimer();
+                          stopWatchTimer.onStartTimer();
                         }
                         setDialogState(() {});
                       })
@@ -615,8 +624,6 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
               );
             })));
   }
-
-
 }
 
 class AddTimeDialogButton extends StatelessWidget {

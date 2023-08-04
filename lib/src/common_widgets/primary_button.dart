@@ -1,6 +1,8 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+
 import 'package:todo_sample/src/config/app_theme.dart';
 import 'package:todo_sample/src/config/typography.dart';
 
@@ -9,12 +11,14 @@ class PrimaryButton extends StatelessWidget {
   final Function? onTap;
   final bool isLoading;
   final bool isDisabled;
+  final Widget? icon;
   const PrimaryButton({
     Key? key,
     required this.title,
+    this.onTap,
     this.isLoading = false,
     this.isDisabled = false,
-    this.onTap,
+    this.icon,
   }) : super(key: key);
 
   @override
@@ -42,10 +46,23 @@ class PrimaryButton extends StatelessWidget {
                   ? const Center(
                       child: CircularProgressIndicator(color: Colors.white),
                     )
-                  : Text(
-                      title,
-                      style: AppTypography.button.copyWith(),
-                    ))),
+                  : icon != null
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            icon!,
+                            const SizedBox(width: 8),
+                            _buildText(),
+                          ],
+                        )
+                      : _buildText())),
+    );
+  }
+
+  Text _buildText() {
+    return Text(
+      title,
+      style: AppTypography.button.copyWith(),
     );
   }
 }

@@ -97,15 +97,16 @@ class Task {
         timeframe: data['timeframe'] as String,
         description: data['description'] as String,
         createdAt: DateTime.parse(data['createdAt']),
-        updatedAt: data['updatedAt'] == null
-            ? DateTime.parse(data['createdAt'])
-            : DateTime.parse(data['updatedAt']),
+        
         expectedCompletion: data['expectedCompletion'] != null
             ? DateTime.parse(data['expectedCompletion'])
             : null,
         goalId: data['goalId'] as String?,
         isMarkedForToday: data['isMarkedForToday'] as bool,
         totalMinutesSpent: data['totalMinutesSpent'],
+        updatedAt: data['updatedAt'] == null
+            ? DateTime.parse(data['createdAt'])
+            : DateTime.parse(data['updatedAt']),
         isCompleted:
             data['isCompleted'] == null ? null : data['isCompleted'] as bool);
   }

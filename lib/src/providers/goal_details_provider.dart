@@ -45,6 +45,7 @@ class GoalDetailsProvider with ChangeNotifier {
         data: goal!
             .copyWith(
               isCompleted: isCompleted.value ? false : true,
+              updatedAt: DateTime.now(),
             )
             .toMap(),
       );
@@ -79,6 +80,27 @@ class GoalDetailsProvider with ChangeNotifier {
     } finally {
       loadingGoal.value = false;
     }
+  }
+
+  Future<void> updateTotalTime({required int minutes}) async {
+    try {
+      final alreadySpent = goal!.totalMinutesSpent ?? 0;
+
+      final g = goal!.copyWith(
+        totalMinutesSpent: alreadySpent + minutes,
+        updatedAt: DateTime.now(),
+      );
+
+      await db.updateDocument(
+        databaseId: primaryDatabaseId,
+        collectionId: goalsCollectionId,
+        documentId: goal!.id,
+        data: g.toMap(),
+      );
+      await fetchGoal(g.id);
+    } catch (exception) {
+      log("Error in updateTotalTime - $exception");
+    } finally {}
   }
 
   Future<List<Task>> getTasksFromDb(String goalId) async {

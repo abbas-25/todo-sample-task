@@ -7,16 +7,21 @@ class Goal {
   final String id;
   final String title;
   final String type;
-  final String description;  
+  final String description;
   final bool isCompleted;
+  final int? totalMinutesSpent;
+  final DateTime? updatedAt;
+  final DateTime? createdAt;
   Goal({
     required this.id,
     required this.title,
     required this.type,
     required this.description,
     required this.isCompleted,
+    this.totalMinutesSpent,
+    this.updatedAt,
+    this.createdAt,
   });
-
 
   Goal copyWith({
     String? id,
@@ -24,14 +29,21 @@ class Goal {
     String? type,
     String? description,
     bool? isCompleted,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    int? totalMinutesSpent,
   }) {
     return Goal(
-      id: id ?? this.id,
-      title: title ?? this.title,
-      type: type ?? this.type,
-      description: description ?? this.description,
-      isCompleted: isCompleted ?? this.isCompleted,
-    );
+        id: id ?? this.id,
+        title: title ?? this.title,
+        type: type ?? this.type,
+        description: description ?? this.description,
+        isCompleted: isCompleted ?? this.isCompleted,
+        totalMinutesSpent: totalMinutesSpent ?? this.totalMinutesSpent,
+        createdAt: createdAt, 
+        updatedAt: updatedAt, 
+        
+        );
   }
 
   Map<String, dynamic> toMap() {
@@ -40,6 +52,9 @@ class Goal {
       'type': type,
       'description': description,
       'isCompleted': isCompleted,
+      'totalMinutesSpent': totalMinutesSpent,
+      'updatedAt': updatedAt?.toString(),
+      'createdAt': createdAt?.toString(),
     };
   }
 
@@ -50,9 +65,15 @@ class Goal {
       type: map['type'] as String,
       description: map['description'] as String,
       isCompleted: map['isCompleted'] as bool,
+      totalMinutesSpent: map['totalMinutesSpent'],
+      createdAt: map['createdAt'] == null
+          ? null
+          : DateTime.parse(map['createdAt']),
+      updatedAt:
+          map['updatedAt'] == null ? null : DateTime.parse(map['updatedAt']),
     );
   }
-  
+
   factory Goal.fromAppwriteDoc(Document doc) {
     final data = doc.data;
     return Goal(
@@ -61,12 +82,20 @@ class Goal {
       title: data['title'] as String,
       type: data['type'] as String,
       description: data['description'] as String,
+      totalMinutesSpent: data['totalMinutesSpent'],
+      createdAt: data['createdAt'] == null
+          ? null
+          : DateTime.parse(data['createdAt']),
+      updatedAt: data['updatedAt'] == null
+          ? null
+          : DateTime.parse(data['updatedAt']),
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory Goal.fromJson(String source) => Goal.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory Goal.fromJson(String source) =>
+      Goal.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {
@@ -76,21 +105,20 @@ class Goal {
   @override
   bool operator ==(covariant Goal other) {
     if (identical(this, other)) return true;
-  
-    return 
-      other.id == id &&
-      other.title == title &&
-      other.type == type &&
-      other.description == description &&
-      other.isCompleted == isCompleted;
+
+    return other.id == id &&
+        other.title == title &&
+        other.type == type &&
+        other.description == description &&
+        other.isCompleted == isCompleted;
   }
 
   @override
   int get hashCode {
     return id.hashCode ^
-      title.hashCode ^
-      type.hashCode ^
-      description.hashCode ^
-      isCompleted.hashCode;
+        title.hashCode ^
+        type.hashCode ^
+        description.hashCode ^
+        isCompleted.hashCode;
   }
 }

@@ -86,7 +86,9 @@ class TaskDetailsProvider with ChangeNotifier {
           databaseId: primaryDatabaseId,
           collectionId: tasksCollectionId,
           documentId: taskId);
+          
       task.value = Task.fromAppwriteDoc(response);
+      log("TSK task.value updated ${task.value?.totalMinutesSpent}");
       isCompleted.value = task.value!.isCompleted ?? false;
 
       if (goalId != null) {
@@ -96,6 +98,7 @@ class TaskDetailsProvider with ChangeNotifier {
             documentId: goalId);
         goal.value = Goal.fromAppwriteDoc(goalResponse);
       }
+
     } catch (exception) {
       log("Error in fetchGoal - $exception");
     } finally {
@@ -137,7 +140,7 @@ class TaskDetailsProvider with ChangeNotifier {
       await fetchTaskAndGoal(tsk.id);
 
     } catch (exception) {
-      log("Error in updateTotalTime - $exception");
+      log("TSK Error in updateTotalTime - $exception");
     } finally {}
   }
 
