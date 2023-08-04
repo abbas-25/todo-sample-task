@@ -137,6 +137,8 @@ class _NewTaskPageState extends State<NewTaskPage> {
 
                                     var task = Task(
                                       id: "", // not used in creation
+                                      totalMinutesSpent: 0,
+                                      updatedAt: null,
                                       createdAt: DateTime.now(),
                                       isMarkedForToday: timeframe!
                                               .toLowerCase()

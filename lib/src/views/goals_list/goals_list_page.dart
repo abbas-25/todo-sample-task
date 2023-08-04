@@ -126,6 +126,9 @@ class _TypeFilter extends StatelessWidget {
                 context: context,
                 builder: (_) {
                   return AlertDialog(
+                      shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12)
+          ),
                     content: SizedBox(
                       width: double.maxFinite,
                       child: Column(

@@ -237,6 +237,9 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
         builder: ((context) => AlertDialog(
               // contentPadding: const EdgeInsets.all(20),
               actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+                shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12)
+          ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -287,9 +290,11 @@ class CompleteWidget extends StatelessWidget {
 }
 
 class PopupCloseButton extends StatelessWidget {
+  final Function()? callBeforeClosing;
   const PopupCloseButton({
-    super.key,
-  });
+    Key? key,
+    this.callBeforeClosing,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -298,6 +303,9 @@ class PopupCloseButton extends StatelessWidget {
         const Spacer(),
         InkWell(
           onTap: () {
+            if(callBeforeClosing != null) {
+              callBeforeClosing!();
+            }
             Navigator.of(context).pop();
           },
           child: const Icon(

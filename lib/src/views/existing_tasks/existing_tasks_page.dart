@@ -75,20 +75,19 @@ class _ExistingTasksPageState extends State<ExistingTasksPage> {
                     }
 
                     return Consumer<ExistingTasksProvider>(
-                      builder: (context, _, __) {
-                        return ListView.builder(
-                            itemCount: prov.visibleTasks.length,
-                            itemBuilder: (context, index) {
-                              return Column(
-                                children: [
-                                  SingleExistingTaskTile(
-                                      task: prov.visibleTasks[index]),
-                                  const SizedBox(height: 16),
-                                ],
-                              );
-                            });
-                      }
-                    );
+                        builder: (context, _, __) {
+                      return ListView.builder(
+                          itemCount: prov.visibleTasks.length,
+                          itemBuilder: (context, index) {
+                            return Column(
+                              children: [
+                                SingleExistingTaskTile(
+                                    task: prov.visibleTasks[index]),
+                                const SizedBox(height: 16),
+                              ],
+                            );
+                          });
+                    });
                   }),
             ),
             const SizedBox(
@@ -154,6 +153,8 @@ class _TimeframeFilter extends StatelessWidget {
                     context: context,
                     builder: (_) {
                       return AlertDialog(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
                         content: SizedBox(
                           width: double.maxFinite,
                           child: Column(
@@ -245,9 +246,9 @@ class FilterItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          color: const Color(0xffF2F2F2),
-          ),
+        borderRadius: BorderRadius.circular(10),
+        color: const Color(0xffF2F2F2),
+      ),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Center(
           child: Text(
@@ -267,90 +268,90 @@ class _TypeFilter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ExistingTasksProvider>(
-        builder: (context, _, __) {
-          return SizedBox(
-            height: 40,
-            child: InkWell(
-              onTap: () {
-                showDialog(
-                    context: context,
-                    builder: (_) {
-                      return AlertDialog(
-                        content: SizedBox(
-                          width: double.maxFinite,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const PopupCloseButton(),
-                              Center(
-                                  child: Text(
-                                "Type",
-                                style: AppTypography.title
-                                    .copyWith(fontWeight: FontWeight.w500),
-                              )),
-                              const SizedBox(
-                                height: 24,
-                              ),
-                              Flexible(
-                                child: ListView.builder(
-                                    shrinkWrap: true,
-                                    itemCount: prov.typeFilters.length,
-                                    itemBuilder: (context, index) {
-                                      final item = prov.typeFilters[index];
-                                      return InkWell(
-                                        onTap: () {
-                                          prov.filterTasks(type: item);
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: Column(
-                                          children: [
-                                            FilterItem(item: item),
-                                            const SizedBox(
-                                              height: 8,
-                                            )
-                                          ],
-                                        ),
-                                      );
-                                    }),
-                              ),
-                            ],
+    return Consumer<ExistingTasksProvider>(builder: (context, _, __) {
+      return SizedBox(
+        height: 40,
+        child: InkWell(
+          onTap: () {
+            showDialog(
+                context: context,
+                builder: (_) {
+                  return AlertDialog(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                    content: SizedBox(
+                      width: double.maxFinite,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const PopupCloseButton(),
+                          Center(
+                              child: Text(
+                            "Type",
+                            style: AppTypography.title
+                                .copyWith(fontWeight: FontWeight.w500),
+                          )),
+                          const SizedBox(
+                            height: 24,
                           ),
-                        ),
-                      );
-                    });
-              },
-              child: Container(
-                margin: const EdgeInsets.only(right: 12),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  color: prov.selectedTypeFilter.value != null
-                      ? AppTheme.primaryColor
-                      : const Color(0xffEDF3FF),
-                ),
-                child: Row(
-                  children: [
-                    Text(prov.selectedTypeFilter.value ?? "Type",
-                        style: AppTypography.input.copyWith(
-                            color: prov.selectedTypeFilter.value != null
-                                ? Colors.white
-                                : AppTypography.textDefaultColor)),
-                    const SizedBox(
-                      width: 7.75,
+                          Flexible(
+                            child: ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: prov.typeFilters.length,
+                                itemBuilder: (context, index) {
+                                  final item = prov.typeFilters[index];
+                                  return InkWell(
+                                    onTap: () {
+                                      prov.filterTasks(type: item);
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Column(
+                                      children: [
+                                        FilterItem(item: item),
+                                        const SizedBox(
+                                          height: 8,
+                                        )
+                                      ],
+                                    ),
+                                  );
+                                }),
+                          ),
+                        ],
+                      ),
                     ),
-                    Icon(
-                      Icons.keyboard_arrow_down_rounded,
-                      color: prov.selectedTypeFilter.value != null
-                          ? Colors.white
-                          : const Color(0xff404040),
-                    ),
-                  ],
-                ),
-              ),
+                  );
+                });
+          },
+          child: Container(
+            margin: const EdgeInsets.only(right: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              color: prov.selectedTypeFilter.value != null
+                  ? AppTheme.primaryColor
+                  : const Color(0xffEDF3FF),
             ),
-          );
-        });
+            child: Row(
+              children: [
+                Text(prov.selectedTypeFilter.value ?? "Type",
+                    style: AppTypography.input.copyWith(
+                        color: prov.selectedTypeFilter.value != null
+                            ? Colors.white
+                            : AppTypography.textDefaultColor)),
+                const SizedBox(
+                  width: 7.75,
+                ),
+                Icon(
+                  Icons.keyboard_arrow_down_rounded,
+                  color: prov.selectedTypeFilter.value != null
+                      ? Colors.white
+                      : const Color(0xff404040),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    });
   }
 }

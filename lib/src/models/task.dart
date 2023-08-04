@@ -1,5 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:appwrite/models.dart';
 
@@ -15,6 +16,8 @@ class Task {
   final String? goalId;
   final bool isMarkedForToday;
   final bool? isCompleted;
+  final DateTime? updatedAt;
+  final int? totalMinutesSpent;
   Task({
     required this.id,
     required this.title,
@@ -27,6 +30,8 @@ class Task {
     this.goalId,
     required this.isMarkedForToday,
     this.isCompleted,
+    this.updatedAt,
+    this.totalMinutesSpent,
   });
 
   String get getTaskPriorityString => priority.replaceAll("_", " ");
@@ -44,6 +49,8 @@ class Task {
     String? goalId,
     bool? isMarkedForToday,
     bool? isCompleted,
+    int? totalMinutesSpent,
+    DateTime? updatedAt,
   }) {
     return Task(
       id: id ?? this.id,
@@ -57,6 +64,8 @@ class Task {
       goalId: goalId ?? this.goalId,
       isMarkedForToday: isMarkedForToday ?? this.isMarkedForToday,
       isCompleted: isCompleted ?? this.isCompleted,
+      updatedAt: updatedAt ?? this.updatedAt,
+      totalMinutesSpent: totalMinutesSpent ?? this.totalMinutesSpent,
     );
   }
 
@@ -68,15 +77,18 @@ class Task {
       'timeframe': timeframe,
       'description': description,
       'createdAt': createdAt.toString(),
+      'updatedAt': updatedAt.toString(),
       'expectedCompletion': expectedCompletion?.toString(),
       'goalId': goalId,
       'isMarkedForToday': isMarkedForToday,
       'isCompleted': isCompleted,
+      'totalMinutesSpent': totalMinutesSpent,
     };
   }
 
   factory Task.fromAppwriteDoc(Document doc) {
     final data = doc.data;
+    log("TSK $data");
     return Task(
         id: doc.$id,
         title: data['title'] as String,
@@ -85,11 +97,15 @@ class Task {
         timeframe: data['timeframe'] as String,
         description: data['description'] as String,
         createdAt: DateTime.parse(data['createdAt']),
+        updatedAt: data['updatedAt'] == null
+            ? DateTime.parse(data['createdAt'])
+            : DateTime.parse(data['updatedAt']),
         expectedCompletion: data['expectedCompletion'] != null
             ? DateTime.parse(data['expectedCompletion'])
             : null,
         goalId: data['goalId'] as String?,
         isMarkedForToday: data['isMarkedForToday'] as bool,
+        totalMinutesSpent: data['totalMinutesSpent'],
         isCompleted:
             data['isCompleted'] == null ? null : data['isCompleted'] as bool);
   }
@@ -162,7 +178,11 @@ class Task {
       priority: map['priority'] as String,
       timeframe: map['timeframe'] as String,
       description: map['description'] as String,
+      totalMinutesSpent: map['totalMinutesSpent'] as int,
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt'] as int),
+      updatedAt: map['updatedAt'] == null
+          ? DateTime.fromMillisecondsSinceEpoch(map['createdAt'] as int)
+          : DateTime.fromMillisecondsSinceEpoch(map['updatedAt'] as int),
       expectedCompletion: map['expectedCompletion'] != null
           ? DateTime.fromMillisecondsSinceEpoch(
               map['expectedCompletion'] as int)

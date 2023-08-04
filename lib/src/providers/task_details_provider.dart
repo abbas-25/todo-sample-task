@@ -15,14 +15,22 @@ class TaskDetailsProvider with ChangeNotifier {
   });
 
   ValueNotifier<Goal?> goal = ValueNotifier(null);
-  ValueNotifier<bool> isLoadingGoal = ValueNotifier(true);
+  ValueNotifier<Task?> task = ValueNotifier(null);
+  ValueNotifier<bool> isLoadingTaskAndGoal = ValueNotifier(true);
   ValueNotifier<bool> isMarkingTaskForToday = ValueNotifier(false);
   ValueNotifier<bool> isTogglingTaskStatus = ValueNotifier(false);
   ValueNotifier<bool> isCompleted = ValueNotifier(false);
 
+  init(String taskId, [String? goalId]) {
+    fetchTaskAndGoal(taskId, goalId);
+  }
+
   reset() {
     isCompleted.value = false;
+    task.value = null;
+    goal.value = null;
     isTogglingTaskStatus.value = false;
+    isLoadingTaskAndGoal.value  = true;
   }
 
   Future<bool> markTaskForToday(Task task) async {
@@ -36,6 +44,7 @@ class TaskDetailsProvider with ChangeNotifier {
         data: task
             .copyWith(
               isMarkedForToday: true,
+              updatedAt: DateTime.now(),
             )
             .toMap(),
       );
@@ -58,6 +67,7 @@ class TaskDetailsProvider with ChangeNotifier {
         data: task
             .copyWith(
               isMarkedForToday: false,
+              updatedAt: DateTime.now(),
             )
             .toMap(),
       );
@@ -69,39 +79,69 @@ class TaskDetailsProvider with ChangeNotifier {
     }
   }
 
-  Future<Goal?> fetchGoal(String goalId) async {
+  Future<void> fetchTaskAndGoal(String taskId, [String? goalId]) async {
     try {
-      isLoadingGoal.value = true;
-      final response = await db.getDocument(
-          databaseId: primaryDatabaseId,
-          collectionId: goalsCollectionId,
-          documentId: goalId);
-      return goal.value = Goal.fromAppwriteDoc(response);
-    } catch (exception) {
-      log("Error in fetchGoal - $exception");
-      return null;
-    } finally {
-      isLoadingGoal.value = false;
-    }
-  }
-  
-  Future<void> updateCompletedStatus(Task task) async {
-    try {
+      isLoadingTaskAndGoal.value = true;
       final response = await db.getDocument(
           databaseId: primaryDatabaseId,
           collectionId: tasksCollectionId,
-          documentId: task.id);
-      final t = Task.fromAppwriteDoc(response);
+          documentId: taskId);
+      task.value = Task.fromAppwriteDoc(response);
+      isCompleted.value = task.value!.isCompleted ?? false;
 
-      log("updateCompletedStatus - ${t.isCompleted}");
-      isCompleted.value = t.isCompleted ?? false;
+      if (goalId != null) {
+        final goalResponse = await db.getDocument(
+            databaseId: primaryDatabaseId,
+            collectionId: goalsCollectionId,
+            documentId: goalId);
+        goal.value = Goal.fromAppwriteDoc(goalResponse);
+      }
     } catch (exception) {
-      log("Error in updateCompletedStatus - $exception");
+      log("Error in fetchGoal - $exception");
     } finally {
+      isLoadingTaskAndGoal.value = false;
     }
   }
 
-  Future<void> toggleTaskComplete(Task task) async {
+  // Future<void> updateCompletedStatus(Task task) async {
+  //   try {
+  //     final response = await db.getDocument(
+  //         databaseId: primaryDatabaseId,
+  //         collectionId: tasksCollectionId,
+  //         documentId: task.id);
+  //     final t = Task.fromAppwriteDoc(response);
+
+  //     log("updateCompletedStatus - ${t.isCompleted}");
+  //     isCompleted.value = t.isCompleted ?? false;
+  //   } catch (exception) {
+  //     log("Error in updateCompletedStatus - $exception");
+  //   } finally {}
+  // }
+
+  Future<void> updateTotalTime(
+      {required int minutes}) async {
+    try {
+      final alreadySpent = task.value!.totalMinutesSpent ?? 0;
+
+      final tsk = task.value!.copyWith(
+        totalMinutesSpent: alreadySpent + minutes,
+        updatedAt: DateTime.now(),
+      );
+
+      await db.updateDocument(
+        databaseId: primaryDatabaseId,
+        collectionId: tasksCollectionId,
+        documentId: task.value!.id,
+        data: tsk.toMap(),
+      );
+      await fetchTaskAndGoal(tsk.id);
+
+    } catch (exception) {
+      log("Error in updateTotalTime - $exception");
+    } finally {}
+  }
+
+  Future<void> toggleTaskComplete() async {
     try {
       isTogglingTaskStatus.value = true;
 
@@ -110,10 +150,11 @@ class TaskDetailsProvider with ChangeNotifier {
       await db.updateDocument(
         databaseId: primaryDatabaseId,
         collectionId: tasksCollectionId,
-        documentId: task.id,
-        data: task
+        documentId: task.value!.id,
+        data: task.value!
             .copyWith(
               isCompleted: isCompleted.value ? false : true,
+              updatedAt: DateTime.now(),
             )
             .toMap(),
       );
