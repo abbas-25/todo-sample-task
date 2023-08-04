@@ -615,6 +615,8 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
               );
             })));
   }
+
+
 }
 
 class AddTimeDialogButton extends StatelessWidget {
