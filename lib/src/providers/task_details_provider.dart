@@ -87,6 +87,7 @@ class TaskDetailsProvider with ChangeNotifier {
           collectionId: tasksCollectionId,
           documentId: taskId);
           
+      task.value = null;
       task.value = Task.fromAppwriteDoc(response);
       log("TSK task.value updated ${task.value?.totalMinutesSpent}");
       isCompleted.value = task.value!.isCompleted ?? false;
@@ -129,6 +130,7 @@ class TaskDetailsProvider with ChangeNotifier {
       final tsk = task.value!.copyWith(
         totalMinutesSpent: alreadySpent + minutes,
         updatedAt: DateTime.now(),
+        isCompleted: task.value!.isCompleted ?? false, 
       );
 
       await db.updateDocument(

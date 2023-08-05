@@ -11,7 +11,6 @@ import 'package:todo_sample/src/common_widgets/primary_appbar.dart';
 import 'package:todo_sample/src/common_widgets/primary_button.dart';
 import 'package:todo_sample/src/config/app_theme.dart';
 import 'package:todo_sample/src/config/typography.dart';
-import 'package:todo_sample/src/providers/edit_tasks_provider.dart';
 import 'package:todo_sample/src/providers/task_details_provider.dart';
 import 'package:todo_sample/src/utils/utils.dart';
 import 'package:todo_sample/src/views/goal_details/goal_details_page.dart';
@@ -49,28 +48,22 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _buildAppBar(),
-      body: ValueListenableBuilder(
-          valueListenable: detailsProvider.task,
-          builder: (context, _, __) {
-            log("TSK refreshing");
-            if (detailsProvider.task.value == null) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }
+    return  Scaffold(
+          appBar: _buildAppBar(),
+          body: ValueListenableBuilder(
+              valueListenable: detailsProvider.isLoadingTaskAndGoal,
+              builder: (context, dp, __) {
+                log("TSK task.value rebuilding2 ${detailsProvider.task.value?.totalMinutesSpent}");
+                if (detailsProvider.isLoadingTaskAndGoal.value) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
 
-            final task = detailsProvider.task.value!;
-            return Consumer<EditTaskProvider>(
-              builder: (context, prov, __) {
-                return Stack(
-                  children: [
-                    Positioned.fill(
-                      child: IgnorePointer(
-                        ignoring: prov.isProcessing,
-                        child: Opacity(
-                          opacity: prov.isProcessing ? 0.5 : 1,
+                final task = detailsProvider.task.value!;
+                return  Stack(
+                      children: [
+                        Positioned.fill(
                           child: SingleChildScrollView(
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
@@ -174,63 +167,56 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                             ),
                           ),
                         ),
-                      ),
-                    ),
-                    if (prov.isProcessing)
-                      const Center(
-                          child: CircularProgressIndicator()),
-                  ],
+                      ],
                 );
-              },
-            );
-          }),
-      bottomSheet: ValueListenableBuilder(
-          valueListenable: detailsProvider.task,
-          builder: (context, _, __) {
-            // if (detailsProvider.isLoadingTaskAndGoal.value) {
-            //   return const SizedBox.shrink();
-            // }
+              }),
+          bottomSheet: ValueListenableBuilder(
+              valueListenable: detailsProvider.task,
+              builder: (context, _, __) {
+                // if (detailsProvider.isLoadingTaskAndGoal.value) {
+                //   return const SizedBox.shrink();
+                // }
 
-            final task = detailsProvider.task.value;
-            if(task == null) return const SizedBox.shrink();
+                final task = detailsProvider.task.value;
+                if(task == null) return const SizedBox.shrink();
 
-            return Padding(
-              padding: const EdgeInsets.all(20),
-              child: ValueListenableBuilder(
-                  valueListenable: detailsProvider.isMarkingTaskForToday,
-                  builder: (context, _, __) {
-                    return PrimaryButton(
-                        isLoading:
-                            detailsProvider.isMarkingTaskForToday.value,
-                        title: task.isMarkedForToday
-                            ? "Remove From Today's Task"
-                            : "Move to Today's Task",
-                        onTap: () async {
-                          if (task.isMarkedForToday) {
-                            detailsProvider
-                                .removeTaskForToday(task)
-                                .then((value) {
-                              if (value) {
-                                Navigator.of(context).pop(true);
+                return Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: ValueListenableBuilder(
+                      valueListenable: detailsProvider.isMarkingTaskForToday,
+                      builder: (context, _, __) {
+                        return PrimaryButton(
+                            isLoading:
+                                detailsProvider.isMarkingTaskForToday.value,
+                            title: task.isMarkedForToday
+                                ? "Remove From Today's Task"
+                                : "Move to Today's Task",
+                            onTap: () async {
+                              if (task.isMarkedForToday) {
+                                detailsProvider
+                                    .removeTaskForToday(task)
+                                    .then((value) {
+                                  if (value) {
+                                    Navigator.of(context).pop(true);
+                                  } else {
+                                    // todo show toast
+                                  }
+                                });
                               } else {
-                                // todo show toast
+                                detailsProvider
+                                    .markTaskForToday(task)
+                                    .then((value) {
+                                  if (value) {
+                                    Navigator.of(context).pop(true);
+                                  } else {
+                                    // todo show toast
+                                  }
+                                });
                               }
                             });
-                          } else {
-                            detailsProvider
-                                .markTaskForToday(task)
-                                .then((value) {
-                              if (value) {
-                                Navigator.of(context).pop(true);
-                              } else {
-                                // todo show toast
-                              }
-                            });
-                          }
-                        });
-                  }),
-            );
-          }),
+                      }),
+                );
+              }),
     );
   }
 
