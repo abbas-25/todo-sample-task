@@ -30,7 +30,7 @@ class TaskDetailsProvider with ChangeNotifier {
     task.value = null;
     goal.value = null;
     isTogglingTaskStatus.value = false;
-    isLoadingTaskAndGoal.value  = true;
+    isLoadingTaskAndGoal.value = true;
   }
 
   Future<bool> markTaskForToday(Task task) async {
@@ -86,7 +86,7 @@ class TaskDetailsProvider with ChangeNotifier {
           databaseId: primaryDatabaseId,
           collectionId: tasksCollectionId,
           documentId: taskId);
-          
+
       task.value = null;
       task.value = Task.fromAppwriteDoc(response);
       log("TSK task.value updated ${task.value?.totalMinutesSpent}");
@@ -99,7 +99,6 @@ class TaskDetailsProvider with ChangeNotifier {
             documentId: goalId);
         goal.value = Goal.fromAppwriteDoc(goalResponse);
       }
-
     } catch (exception) {
       log("Error in fetchGoal - $exception");
     } finally {
@@ -122,15 +121,14 @@ class TaskDetailsProvider with ChangeNotifier {
   //   } finally {}
   // }
 
-  Future<void> updateTotalTime(
-      {required int minutes}) async {
+  Future<void> updateTotalTime({required int minutes}) async {
     try {
       final alreadySpent = task.value!.totalMinutesSpent ?? 0;
 
       final tsk = task.value!.copyWith(
         totalMinutesSpent: alreadySpent + minutes,
         updatedAt: DateTime.now(),
-        isCompleted: task.value!.isCompleted ?? false, 
+        isCompleted: task.value!.isCompleted ?? false,
       );
 
       await db.updateDocument(
@@ -139,8 +137,22 @@ class TaskDetailsProvider with ChangeNotifier {
         documentId: task.value!.id,
         data: tsk.toMap(),
       );
-      await fetchTaskAndGoal(tsk.id);
 
+      if (goal.value != null) {
+        await db.updateDocument(
+          databaseId: primaryDatabaseId,
+          collectionId: goalsCollectionId,
+          documentId: goal.value!.id,
+          data: goal.value!
+              .copyWith(
+                totalMinutesSpent:
+                    (goal.value!.totalMinutesSpent ?? 0) + minutes,
+              )
+              .toMap(),
+        );
+      }
+
+      await fetchTaskAndGoal(tsk.id);
     } catch (exception) {
       log("TSK Error in updateTotalTime - $exception");
     } finally {}
