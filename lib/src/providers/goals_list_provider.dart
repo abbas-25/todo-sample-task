@@ -33,6 +33,9 @@ class GoalsListProvider with ChangeNotifier {
       final response = await db.listDocuments(
         databaseId: primaryDatabaseId,
         collectionId: goalsCollectionId,
+        queries: [
+          Query.equal("isCompleted", false),
+        ]
       );
 
       List<Goal> models = [];

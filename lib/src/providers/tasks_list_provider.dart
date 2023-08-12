@@ -24,6 +24,9 @@ class TasksListProvider with ChangeNotifier {
       final response = await db.listDocuments(
         databaseId: primaryDatabaseId,
         collectionId: tasksCollectionId,
+        queries: [
+          Query.equal("isCompleted", false),
+        ]
       );
 
       List<Task> models = [];

@@ -25,7 +25,8 @@ class TodayTasksListProvider with ChangeNotifier {
         databaseId: primaryDatabaseId,
         collectionId: tasksCollectionId,
         queries: [
-          Query.equal("isMarkedForToday", true)
+          Query.equal("isMarkedForToday", true),
+          Query.equal("isCompleted", false),
         ]
       );
 

@@ -45,7 +45,7 @@ class ExistingTasksProvider with ChangeNotifier {
       final response = await db.listDocuments(
           databaseId: primaryDatabaseId,
           collectionId: tasksCollectionId,
-          queries: [Query.equal("isMarkedForToday", false)]);
+          queries: [Query.equal("isMarkedForToday", false), Query.equal("isCompleted", false),]);
 
       List<Task> models = [];
 
